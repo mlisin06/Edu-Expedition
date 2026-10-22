@@ -1,0 +1,762 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Petualangan 15 Pos Gunung - Gamifikasi Pembelajaran</title>
+    <!-- Tailwind CSS CDN -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- FontAwesome Icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <!-- Google Fonts: Montserrat & Luckiest Guy -->
+    <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;600;700;800&family=Luckiest+Guy&display=swap" rel="stylesheet">
+    <!-- Firebase SDKs -->
+    <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-firestore-compat.js"></script>
+
+    <style>
+        body {
+            font-family: 'Montserrat', sans-serif;
+            background-color: #0f172a;
+            color: #f8fafc;
+        }
+        .font-game {
+            font-family: 'Luckiest Guy', cursive;
+            letter-spacing: 1px;
+        }
+        .mountain-bg {
+            background: linear-gradient(180deg, #0b132b 0%, #1c2541 40%, #3a506b 80%, #2a3d45 100%);
+        }
+        .wood-panel {
+            background: #5c3d2e;
+            background-image: linear-gradient(to bottom, #795238, #4a2e1b);
+            border: 3px solid #8b5a2b;
+            box-shadow: inset 0 0 10px rgba(0,0,0,0.5), 0 4px 10px rgba(0,0,0,0.5);
+        }
+        .trail-line {
+            stroke: #f59e0b;
+            stroke-dasharray: 8;
+            animation: dash 30s linear infinite;
+        }
+        @keyframes dash {
+            to { stroke-dashoffset: -1000; }
+        }
+        .pulse-glow {
+            animation: pulse-animation 2s infinite;
+        }
+        @keyframes pulse-animation {
+            0% { box-shadow: 0 0 0 0px rgba(245, 158, 11, 0.7); }
+            70% { box-shadow: 0 0 0 15px rgba(245, 158, 11, 0); }
+            100% { box-shadow: 0 0 0 0px rgba(245, 158, 11, 0); }
+        }
+    </style>
+</head>
+<body class="min-h-screen flex flex-col mountain-bg selection:bg-amber-500 selection:text-slate-900">
+
+    <!-- TOP HEADER & ROLE SWITCHER -->
+    <header class="sticky top-0 z-50 bg-slate-900/90 backdrop-blur-md border-b border-amber-500/30 px-4 py-3 shadow-xl">
+        <div class="max-w-7xl mx-auto flex flex-wrap items-center justify-between gap-3">
+            <div class="flex items-center gap-3">
+                <div class="w-10 h-10 rounded-full bg-gradient-to-tr from-amber-600 to-amber-400 flex items-center justify-center shadow-lg border border-amber-300">
+                    <i class="fa-solid me-0 fa-mountain text-slate-900 text-xl"></i>
+                </div>
+                <div>
+                    <h1 class="font-game text-xl text-amber-400 tracking-wider">EDU-EXPEDITION</h1>
+                    <p class="text-xs text-slate-400 flex items-center gap-1">
+                        <span id="firebaseStatusDot" class="w-2 h-2 rounded-full bg-amber-500 inline-block"></span>
+                        <span id="firebaseStatusText">Mode Local Storage</span>
+                    </p>
+                </div>
+            </div>
+
+            <!-- ROLE SWITCH TOGGLE (SANGAT JELAS) -->
+            <div class="flex items-center bg-slate-800 p-1.5 rounded-xl border border-slate-700 shadow-inner">
+                <span class="text-xs font-bold px-2 text-slate-400 uppercase hidden sm:inline">Pilih Peran:</span>
+                <button id="btnRoleSiswa" onclick="setRole('siswa')" class="px-4 py-1.5 rounded-lg text-xs font-extrabold transition-all duration-200 flex items-center gap-2 bg-amber-500 text-slate-950 shadow-md">
+                    <i class="fa-solid fa-user-graduate"></i> SISWA
+                </button>
+                <button id="btnRoleAdmin" onclick="setRole('admin')" class="px-4 py-1.5 rounded-lg text-xs font-extrabold text-slate-400 hover:text-white transition-all duration-200 flex items-center gap-2">
+                    <i class="fa-solid fa-user-gear"></i> ADMIN
+                </button>
+            </div>
+        </div>
+    </header>
+
+    <!-- ADMIN BANNER INDICATOR -->
+    <div id="adminBanner" class="hidden bg-gradient-to-r from-red-900/90 via-amber-900/90 to-red-900/90 border-b border-red-500/50 px-4 py-2 text-center text-xs font-bold text-amber-200 shadow-inner">
+        <i class="fa-solid fa-triangle-exclamation text-amber-400 animate-bounce mr-2"></i>
+        MODE ADMIN AKTIF: Anda memiliki wewenang mengelola kuis, KKM, materi, dan membuka pos siswa.
+    </div>
+
+    <!-- MAIN CONTAINER -->
+    <main class="flex-grow max-w-7xl w-full mx-auto p-4 sm:p-6 grid grid-cols-1 lg:grid-cols-3 gap-6">
+
+        <!-- LEFT PANEL: MAP PENDAKIAN (2 COLS) -->
+        <section class="lg:col-span-2 flex flex-col gap-4">
+            
+            <!-- Mountain Stats Header -->
+            <div class="wood-panel rounded-2xl p-4 flex flex-wrap items-center justify-between gap-4 text-amber-100">
+                <div>
+                    <h2 class="font-game text-2xl text-amber-300 flex items-center gap-2">
+                        <i class="fa-solid fa-compass text-amber-400"></i> Peta Pendakian Gunung Kawi
+                    </h2>
+                    <p class="text-xs text-amber-200/80">Selesaikan kuis di setiap pos untuk melanjutkan pendakian hingga Puncak (3.100 mdpl)</p>
+                </div>
+                <div class="flex items-center gap-3 text-xs">
+                    <div class="bg-black/40 px-3 py-1.5 rounded-lg border border-amber-500/20">
+                        <span class="text-slate-400 block">Siswa Aktif:</span>
+                        <span id="currentStudentName" class="font-bold text-amber-300">Ahmad Pendaki</span>
+                    </div>
+                    <div class="bg-black/40 px-3 py-1.5 rounded-lg border border-amber-500/20">
+                        <span class="text-slate-400 block">Progres Pos:</span>
+                        <span id="studentProgressText" class="font-bold text-emerald-400">Pos 1 / 15</span>
+                    </div>
+                </div>
+            </div>
+
+            <!-- VISUAL MOUNTAIN TRAIL CONTAINER -->
+            <div class="relative bg-slate-950/60 rounded-2xl border-2 border-slate-700/60 p-4 sm:p-6 overflow-hidden min-h-[600px] flex flex-col justify-between">
+                
+                <!-- Background Mountain SVG Graphics -->
+                <svg class="absolute inset-0 w-full h-full pointer-events-none opacity-20" xmlns="http://www.w3.org/2000/svg">
+                    <!-- Path line connecting posts -->
+                    <path id="svgTrailPath" class="trail-line" d="M 100 550 Q 250 500 400 520 T 700 450 T 300 380 T 600 300 T 200 220 T 500 120 T 400 50" fill="transparent" stroke-width="4"/>
+                </svg>
+
+                <!-- Zone Indicators -->
+                <div class="relative z-10 space-y-8">
+                    
+                    <!-- ZONA 3: TEBING TERJAL & PUNCAK -->
+                    <div class="border-l-4 border-red-500 pl-3">
+                        <span class="text-[10px] font-extrabold tracking-widest text-red-400 bg-red-950/80 px-2 py-0.5 rounded border border-red-800 uppercase">
+                            Zona 3: Tebing Terjal & Puncak (2.100 - 3.100 mdpl)
+                        </span>
+                        <div id="zone3Posts" class="grid grid-cols-2 sm:grid-cols-5 gap-3 mt-3"></div>
+                    </div>
+
+                    <!-- ZONA 2: HUTAN BELANTARA -->
+                    <div class="border-l-4 border-amber-500 pl-3">
+                        <span class="text-[10px] font-extrabold tracking-widest text-amber-400 bg-amber-950/80 px-2 py-0.5 rounded border border-amber-800 uppercase">
+                            Zona 2: Hutan Belantara (1.300 - 1.900 mdpl)
+                        </span>
+                        <div id="zone2Posts" class="grid grid-cols-2 sm:grid-cols-5 gap-3 mt-3"></div>
+                    </div>
+
+                    <!-- ZONA 1: LERENG GUNUNG -->
+                    <div class="border-l-4 border-emerald-500 pl-3">
+                        <span class="text-[10px] font-extrabold tracking-widest text-emerald-400 bg-emerald-950/80 px-2 py-0.5 rounded border border-emerald-800 uppercase">
+                            Zona 1: Lereng Gunung (500 - 1.100 mdpl)
+                        </span>
+                        <div id="zone1Posts" class="grid grid-cols-2 sm:grid-cols-5 gap-3 mt-3"></div>
+                    </div>
+
+                </div>
+
+                <!-- Map Legend -->
+                <div class="relative z-10 mt-6 pt-4 border-t border-slate-800 flex flex-wrap items-center justify-between text-xs text-slate-400 gap-2">
+                    <div class="flex items-center gap-4">
+                        <span class="flex items-center gap-1.5"><i class="fa-solid fa-lock text-slate-500"></i> Terkunci</span>
+                        <span class="flex items-center gap-1.5"><i class="fa-solid fa-campground text-amber-400"></i> Aktif/Terbuka</span>
+                        <span class="flex items-center gap-1.5"><i class="fa-solid fa-flag-checkered text-emerald-400"></i> Selesai</span>
+                    </div>
+                    <span class="text-[11px] text-slate-500">Klik Pos untuk membuka Materi & Kuis</span>
+                </div>
+            </div>
+        </section>
+
+        <!-- RIGHT PANEL: SISWA INTERACTION OR ADMIN DASHBOARD -->
+        <section class="lg:col-span-1 flex flex-col gap-4">
+            
+            <!-- PANEL MODE SISWA: DETAIL POS & KUIS -->
+            <div id="siswaPanel" class="bg-slate-900 border border-slate-800 rounded-2xl p-5 shadow-2xl flex flex-col h-full">
+                
+                <div id="posDefaultState" class="my-auto text-center py-12 px-4">
+                    <div class="w-16 h-16 mx-auto rounded-full bg-slate-800 border border-slate-700 flex items-center justify-center text-amber-400 text-2xl mb-3">
+                        <i class="fa-solid fa-person-hiking animate-bounce"></i>
+                    </div>
+                    <h3 class="font-game text-xl text-slate-200">Pilih Pos Pendakian</h3>
+                    <p class="text-xs text-slate-400 mt-2">Klik salah satu pos yang terbuka di peta untuk mempelajari materi dan mengerjakan tantangan kuis.</p>
+                </div>
+
+                <!-- Pos Active Card Content (Hidden initially) -->
+                <div id="posActiveContent" class="hidden flex-col h-full">
+                    
+                    <!-- Header Pos Detail -->
+                    <div class="border-b border-slate-800 pb-3 mb-4 flex items-center justify-between">
+                        <div>
+                            <span id="posDetailZone" class="text-[10px] uppercase font-bold text-amber-400 tracking-wider block">ZONA 1</span>
+                            <h3 id="posDetailTitle" class="font-game text-xl text-white">Pos 1: Basecamp</h3>
+                        </div>
+                        <div class="text-right">
+                            <span id="posDetailMdpl" class="text-xs font-bold text-slate-400 block">500 mdpl</span>
+                            <span id="posDetailKKM" class="text-[10px] font-extrabold bg-amber-500/10 text-amber-400 px-2 py-0.5 rounded border border-amber-500/20">KKM: 80</span>
+                        </div>
+                    </div>
+
+                    <!-- Tabs Materi / Kuis -->
+                    <div class="flex border-b border-slate-800 mb-4">
+                        <button id="btnTabMateri" onclick="switchSiswaTab('materi')" class="flex-1 py-2 text-xs font-bold text-amber-400 border-b-2 border-amber-400">
+                            <i class="fa-solid fa-book-open mr-1"></i> Materi & Panduan
+                        </button>
+                        <button id="btnTabKuis" onclick="switchSiswaTab('kuis')" class="flex-1 py-2 text-xs font-bold text-slate-400 hover:text-white">
+                            <i class="fa-solid fa-gamepad mr-1"></i> Tantangan Kuis
+                        </button>
+                    </div>
+
+                    <!-- Content Tab: MATERI -->
+                    <div id="tabMateriContent" class="flex-grow space-y-3 overflow-y-auto max-h-[400px] pr-1">
+                        <div class="bg-slate-950 p-3.5 rounded-xl border border-slate-800 text-xs text-slate-300 leading-relaxed" id="posMateriText">
+                            <!-- Materi text inserted dynamically -->
+                        </div>
+                        <button onclick="switchSiswaTab('kuis')" class="w-full py-3 rounded-xl bg-gradient-to-r from-amber-500 to-amber-600 hover:from-amber-400 hover:to-amber-500 text-slate-950 font-extrabold text-xs shadow-lg transition-all flex items-center justify-center gap-2">
+                            MULAI TANTANGAN KUIS <i class="fa-solid fa-arrow-right"></i>
+                        </button>
+                    </div>
+
+                    <!-- Content Tab: KUIS -->
+                    <div id="tabKuisContent" class="hidden flex-grow flex-col justify-between">
+                        <div id="quizContainer" class="space-y-4 overflow-y-auto max-h-[420px] pr-1">
+                            <!-- Quiz questions rendered dynamically -->
+                        </div>
+
+                        <div class="mt-4 pt-3 border-t border-slate-800">
+                            <button id="btnSubmitQuiz" onclick="submitQuiz()" class="w-full py-3 rounded-xl bg-emerald-500 hover:bg-emerald-400 text-slate-950 font-extrabold text-xs shadow-lg transition-all flex items-center justify-center gap-2">
+                                <i class="fa-solid fa-paper-plane"></i> KIRIM JAWABAN & NAIL LEVEL
+                            </button>
+                        </div>
+                    </div>
+
+                </div>
+
+            </div>
+
+            <!-- PANEL MODE ADMIN: DASHBOARD KELOLA -->
+            <div id="adminPanel" class="hidden bg-slate-900 border border-slate-800 rounded-2xl p-5 shadow-2xl flex-col h-full">
+                
+                <div class="border-b border-slate-800 pb-3 mb-4">
+                    <h3 class="font-game text-xl text-red-400 flex items-center gap-2">
+                        <i class="fa-solid fa-sliders"></i> Panel Kelola Admin
+                    </h3>
+                    <p class="text-xs text-slate-400">Atur kuis, KKM, override siswa, dan koneksi Firebase.</p>
+                </div>
+
+                <!-- Admin Sub-tabs -->
+                <div class="flex gap-1 bg-slate-950 p-1 rounded-xl border border-slate-800 mb-4 text-[11px] font-bold">
+                    <button onclick="switchAdminTab('monitoring')" id="adminTab1" class="flex-1 py-1.5 rounded-lg bg-amber-500 text-slate-950">
+                        <i class="fa-solid fa-users"></i> Siswa
+                    </button>
+                    <button onclick="switchAdminTab('editor')" id="adminTab2" class="flex-1 py-1.5 rounded-lg text-slate-400 hover:text-white">
+                        <i class="fa-solid fa-pen-to-square"></i> Pos & Kuis
+                    </button>
+                    <button onclick="switchAdminTab('firebase')" id="adminTab3" class="flex-1 py-1.5 rounded-lg text-slate-400 hover:text-white">
+                        <i class="fa-solid fa-database"></i> Firebase
+                    </button>
+                </div>
+
+                <!-- Admin Tab 1: MONITORING SISWA & OVERRIDE -->
+                <div id="adminTabContentMonitoring" class="space-y-4">
+                    <div class="flex justify-between items-center text-xs">
+                        <span class="font-bold text-slate-300">Daftar Progres Siswa:</span>
+                        <button onclick="exportToCSV()" class="text-[10px] bg-slate-800 hover:bg-slate-700 px-2.5 py-1 rounded border border-slate-700 text-amber-300">
+                            <i class="fa-solid fa-file-excel mr-1"></i> Ekspor CSV
+                        </button>
+                    </div>
+
+                    <div id="studentListContainer" class="space-y-2 max-h-[380px] overflow-y-auto pr-1">
+                        <!-- Student list rendered dynamically -->
+                    </div>
+                </div>
+
+                <!-- Admin Tab 2: EDITOR POS & SOAL DINAMIS -->
+                <div id="adminTabContentEditor" class="hidden space-y-3 overflow-y-auto max-h-[420px] pr-1 text-xs">
+                    <div>
+                        <label class="block font-bold text-slate-300 mb-1">Pilih Pos yang Ingin Diedit:</label>
+                        <select id="adminSelectPos" onchange="loadPosEditorData()" class="w-full bg-slate-950 border border-slate-800 rounded-lg p-2 text-amber-300 font-bold focus:outline-none focus:border-amber-500">
+                            <!-- Options 1-15 generated dynamically -->
+                        </select>
+                    </div>
+
+                    <div class="grid grid-cols-2 gap-2">
+                        <div>
+                            <label class="block text-slate-400 mb-1">Nama Pos:</label>
+                            <input id="editPosTitle" type="text" class="w-full bg-slate-950 border border-slate-800 rounded p-2 text-white">
+                        </div>
+                        <div>
+                            <label class="block text-slate-400 mb-1">KKM Lulus (0-100):</label>
+                            <input id="editPosKKM" type="number" class="w-full bg-slate-950 border border-slate-800 rounded p-2 text-white">
+                        </div>
+                    </div>
+
+                    <div>
+                        <label class="block text-slate-400 mb-1">Materi Pembelajaran Pos:</label>
+                        <textarea id="editPosMateri" rows="3" class="w-full bg-slate-950 border border-slate-800 rounded p-2 text-white text-xs"></textarea>
+                    </div>
+
+                    <div class="pt-2 border-t border-slate-800">
+                        <div class="flex justify-between items-center mb-2">
+                            <span class="font-bold text-amber-400">Daftar Soal Kuis Pos Ini:</span>
+                            <button onclick="addNewQuestionToPos()" class="text-[10px] bg-emerald-600 hover:bg-emerald-500 px-2 py-1 rounded text-white font-bold">
+                                + Tambah Soal
+                            </button>
+                        </div>
+                        <div id="adminQuestionsList" class="space-y-3">
+                            <!-- Questions editor dynamic -->
+                        </div>
+                    </div>
+
+                    <button onclick="savePosChanges()" class="w-full py-2.5 bg-amber-500 hover:bg-amber-400 text-slate-950 font-extrabold rounded-lg shadow mt-2">
+                        <i class="fa-solid fa-floppy-disk mr-1"></i> SIMPAN PERUBAHAN POS
+                    </button>
+                </div>
+
+                <!-- Admin Tab 3: FIREBASE CONFIGURATION -->
+                <div id="adminTabContentFirebase" class="hidden space-y-3 text-xs">
+                    <p class="text-slate-400 leading-relaxed">
+                        Masukkan konfigurasi **Firebase Firestore** Anda di sini untuk menyimpan data kuis dan progres siswa secara cloud real-time.
+                    </p>
+
+                    <div>
+                        <label class="block font-bold text-slate-300 mb-1">JSON Config Firebase:</label>
+                        <textarea id="firebaseConfigInput" rows="6" placeholder='{
+  "apiKey": "AIzaSy...",
+  "authDomain": "app.firebaseapp.com",
+  "projectId": "app-id",
+  "storageBucket": "app.appspot.com",
+  "messagingSenderId": "12345",
+  "appId": "1:12345:web:123"
+}' class="w-full bg-slate-950 border border-slate-800 rounded p-2 font-mono text-[10px] text-amber-300 focus:outline-none focus:border-amber-500"></textarea>
+                    </div>
+
+                    <button onclick="saveFirebaseConfig()" class="w-full py-2.5 bg-sky-600 hover:bg-sky-500 text-white font-extrabold rounded-lg shadow">
+                        <i class="fa-solid fa-plug mr-1"></i> SIMPAN & KONEKSIKAN FIREBASE
+                    </button>
+                </div>
+
+            </div>
+
+        </section>
+
+    </main>
+
+    <!-- FOOTER -->
+    <footer class="mt-auto border-t border-slate-800 bg-slate-950/80 px-4 py-3 text-center text-xs text-slate-500">
+        Edu-Expedition 15 Pos Gunung &copy; 2026 — Sistem Gamifikasi Pembelajaran & Penilaian Berbasis Petualangan Alam.
+    </footer>
+
+    <!-- JAVASCRIPT LOGIC -->
+    <script>
+        // --- DATA DEFAULTS (15 POS & SOAL INITIAL) ---
+        const DEFAULT_POS_DATA = Array.from({ length: 15 }, (_, i) => {
+            const posNum = i + 1;
+            let zone = 1;
+            let mdpl = 500 + (i * 180);
+            if (posNum > 5 && posNum <= 10) zone = 2;
+            if (posNum > 10) zone = 3;
+
+            return {
+                id: posNum,
+                title: `Pos ${posNum}: ${getPosName(posNum)}`,
+                zone: zone,
+                mdpl: mdpl,
+                kkm: 80,
+                materi: `Selamat datang di Pos ${posNum} (${mdpl} mdpl). Di pos ini Anda dipersiapkan untuk memahami materi dasar hingga lanjutan pendakian serta simulasi tantangan alam. Baca dengan cermat sebelum menjawab kuis.`,
+                questions: [
+                    {
+                        id: 1,
+                        text: `Pertanyaan Kunci untuk Pos ${posNum}: Apa persiapan utama sebelum memasuki area pos ini?`,
+                        options: ["Mengecek Fisik & Perlengkapan", "Langsung Berlari Kencang", "Meninggalkan Rombongan", "Tidur Tanpa Tenda"],
+                        correctAnswer: 0
+                    },
+                    {
+                        id: 2,
+                        text: `Bagaimana prinsip dasar kerjasama tim saat berada di Pos ${posNum}?`,
+                        options: ["Berjalan Sendiri-sendiri", "Saling Membantu & Menjaga Jarak Tepat", "Mendahului Ketua Kelompok", "Abaikan Teman yang Lelah"],
+                        correctAnswer: 1
+                    }
+                ]
+            };
+        });
+
+        function getPosName(num) {
+            const names = [
+                "Basecamp Utama", "Gerbang Hutan Pinus", "Lembah Posko 1", "Sungai Jernih", "Rest Area Lereng",
+                "Hutan Belantara", "Gua Batu", "Pos Logistik Darurat", "Celah Angin", "Camp Utama Hutan",
+                "Jalur Berbatu Terjal", "Tebing Kabut", "Pos Badai", "Puncak Bayangan", "PUNCAK AGUNG 3.100 MDPL"
+            ];
+            return names[num - 1] || `Pos ${num}`;
+        }
+
+        // --- MOCK STUDENTS DATA ---
+        let studentsData = [
+            { id: "std_1", name: "Ahmad Pendaki", unlockedPos: 1, scores: {} },
+            { id: "std_2", name: "Siti Petualang", unlockedPos: 3, scores: { 1: 100, 2: 90 } },
+            { id: "std_3", name: "Budi Pramuka", unlockedPos: 5, scores: { 1: 85, 2: 80, 3: 100, 4: 90 } }
+        ];
+
+        // --- APP STATES ---
+        let currentRole = 'siswa'; // 'siswa' or 'admin'
+        let currentStudent = studentsData[0];
+        let posData = JSON.parse(localStorage.getItem('edu_pos_data')) || DEFAULT_POS_DATA;
+        let selectedPosId = null;
+        let db = null; // Firebase Firestore db reference
+
+        // --- INITIALIZATION ---
+        window.onload = function() {
+            initFirebaseFromStorage();
+            renderMap();
+            populateAdminPosSelect();
+            updateStudentProgressUI();
+            renderStudentListAdmin();
+        };
+
+        // --- ROLE SWITCHING ---
+        function setRole(role) {
+            currentRole = role;
+            const btnSiswa = document.getElementById('btnRoleSiswa');
+            const btnAdmin = document.getElementById('btnRoleAdmin');
+            const siswaPanel = document.getElementById('siswaPanel');
+            const adminPanel = document.getElementById('adminPanel');
+            const adminBanner = document.getElementById('adminBanner');
+
+            if (role === 'admin') {
+                btnAdmin.className = "px-4 py-1.5 rounded-lg text-xs font-extrabold transition-all duration-200 flex items-center gap-2 bg-red-600 text-white shadow-md";
+                btnSiswa.className = "px-4 py-1.5 rounded-lg text-xs font-extrabold text-slate-400 hover:text-white transition-all duration-200 flex items-center gap-2";
+                siswaPanel.classList.add('hidden');
+                adminPanel.classList.remove('hidden');
+                adminBanner.classList.remove('hidden');
+            } else {
+                btnSiswa.className = "px-4 py-1.5 rounded-lg text-xs font-extrabold transition-all duration-200 flex items-center gap-2 bg-amber-500 text-slate-950 shadow-md";
+                btnAdmin.className = "px-4 py-1.5 rounded-lg text-xs font-extrabold text-slate-400 hover:text-white transition-all duration-200 flex items-center gap-2";
+                adminPanel.classList.add('hidden');
+                siswaPanel.classList.remove('hidden');
+                adminBanner.classList.add('hidden');
+            }
+        }
+
+        // --- RENDER MOUNTAIN TRAIL MAP ---
+        function renderMap() {
+            const z1Container = document.getElementById('zone1Posts');
+            const z2Container = document.getElementById('zone2Posts');
+            const z3Container = document.getElementById('zone3Posts');
+
+            z1Container.innerHTML = '';
+            z2Container.innerHTML = '';
+            z3Container.innerHTML = '';
+
+            posData.forEach(pos => {
+                const isUnlocked = pos.id <= currentStudent.unlockedPos;
+                const isCompleted = pos.id < currentStudent.unlockedPos;
+                const isActive = pos.id === selectedPosId;
+
+                let btnClass = "wood-panel text-left p-2.5 rounded-xl transition-all duration-200 flex flex-col justify-between border cursor-pointer hover:scale-105 ";
+                
+                if (isCompleted) {
+                    btnClass += "border-emerald-500/80 bg-emerald-950/40 text-emerald-200";
+                } else if (isUnlocked) {
+                    btnClass += "border-amber-400 bg-amber-900/40 text-amber-100 pulse-glow";
+                } else {
+                    btnClass += "border-slate-800 bg-slate-950/80 text-slate-600 opacity-60 cursor-not-allowed";
+                }
+
+                if (isActive) btnClass += " ring-2 ring-amber-300 scale-105";
+
+                const cardHTML = `
+                    <button onclick="selectPos(${pos.id})" ${!isUnlocked ? 'disabled' : ''} class="${btnClass}">
+                        <div class="flex items-center justify-between mb-1">
+                            <span class="font-game text-xs text-amber-300">POS ${pos.id}</span>
+                            ${isCompleted ? '<i class="fa-solid fa-flag-checkered text-emerald-400 text-xs"></i>' :
+                              isUnlocked ? '<i class="fa-solid fa-campground text-amber-400 text-xs animate-pulse"></i>' :
+                              '<i class="fa-solid fa-lock text-slate-600 text-xs"></i>'}
+                        </div>
+                        <p class="font-bold text-[11px] truncate leading-tight">${pos.title.split(':')[1] || pos.title}</p>
+                        <span class="text-[9px] text-slate-400 mt-1 block">${pos.mdpl} mdpl</span>
+                    </button>
+                `;
+
+                if (pos.zone === 1) z1Container.innerHTML += cardHTML;
+                else if (pos.zone === 2) z2Container.innerHTML += cardHTML;
+                else z3Container.innerHTML += cardHTML;
+            });
+        }
+
+        // --- SELECT POS TO VIEW MATERI/KUIS ---
+        function selectPos(posId) {
+            if (posId > currentStudent.unlockedPos) return;
+
+            selectedPosId = posId;
+            renderMap();
+
+            const pos = posData.find(p => p.id === posId);
+            document.getElementById('posDefaultState').classList.add('hidden');
+            const activeContent = document.getElementById('posActiveContent');
+            activeContent.classList.remove('hidden');
+            activeContent.classList.add('flex');
+
+            document.getElementById('posDetailZone').innerText = `ZONA ${pos.zone}`;
+            document.getElementById('posDetailTitle').innerText = pos.title;
+            document.getElementById('posDetailMdpl').innerText = `${pos.mdpl} mdpl`;
+            document.getElementById('posDetailKKM').innerText = `KKM: ${pos.kkm}`;
+            document.getElementById('posMateriText').innerText = pos.materi;
+
+            renderQuiz(pos);
+            switchSiswaTab('materi');
+        }
+
+        function switchSiswaTab(tab) {
+            const btnMateri = document.getElementById('btnTabMateri');
+            const btnKuis = document.getElementById('btnTabKuis');
+            const contentMateri = document.getElementById('tabMateriContent');
+            const contentKuis = document.getElementById('tabKuisContent');
+
+            if (tab === 'materi') {
+                btnMateri.className = "flex-1 py-2 text-xs font-bold text-amber-400 border-b-2 border-amber-400";
+                btnKuis.className = "flex-1 py-2 text-xs font-bold text-slate-400 hover:text-white";
+                contentMateri.classList.remove('hidden');
+                contentKuis.classList.add('hidden');
+                contentKuis.classList.remove('flex');
+            } else {
+                btnKuis.className = "flex-1 py-2 text-xs font-bold text-amber-400 border-b-2 border-amber-400";
+                btnMateri.className = "flex-1 py-2 text-xs font-bold text-slate-400 hover:text-white";
+                contentKuis.classList.remove('hidden');
+                contentKuis.classList.add('flex');
+                contentMateri.classList.add('hidden');
+            }
+        }
+
+        // --- RENDER QUIZ FOR STUDENT ---
+        function renderQuiz(pos) {
+            const container = document.getElementById('quizContainer');
+            container.innerHTML = '';
+
+            pos.questions.forEach((q, idx) => {
+                let optionsHTML = '';
+                q.options.forEach((opt, optIdx) => {
+                    optionsHTML += `
+                        <label class="flex items-center gap-2 p-2 rounded-lg bg-slate-900 border border-slate-800 hover:border-amber-500/50 cursor-pointer text-xs transition">
+                            <input type="radio" name="q_${q.id}" value="${optIdx}" class="accent-amber-500">
+                            <span>${opt}</span>
+                        </label>
+                    `;
+                });
+
+                container.innerHTML += `
+                    <div class="bg-slate-950 p-3 rounded-xl border border-slate-800 space-y-2">
+                        <p class="font-bold text-xs text-amber-200">${idx + 1}. ${q.text}</p>
+                        <div class="space-y-1.5">${optionsHTML}</div>
+                    </div>
+                `;
+            });
+        }
+
+        // --- SUBMIT QUIZ & PASS/FAIL GATE ---
+        function submitQuiz() {
+            const pos = posData.find(p => p.id === selectedPosId);
+            let correctCount = 0;
+
+            pos.questions.forEach(q => {
+                const selected = document.querySelector(`input[name="q_${q.id}"]:checked`);
+                if (selected && parseInt(selected.value) === q.correctAnswer) {
+                    correctCount++;
+                }
+            });
+
+            const score = Math.round((correctCount / pos.questions.length) * 100);
+            currentStudent.scores[pos.id] = score;
+
+            if (score >= pos.kkm) {
+                alert(`🎉 SELAMAT! Anda LULUS Pos ${pos.id} dengan Nilai: ${score}\n\nAkses Pos ${pos.id + 1} berhasil DIBUKA!`);
+                if (pos.id === currentStudent.unlockedPos && currentStudent.unlockedPos < 15) {
+                    currentStudent.unlockedPos++;
+                }
+                saveStudentsData();
+                updateStudentProgressUI();
+                renderMap();
+                selectPos(currentStudent.unlockedPos);
+            } else {
+                alert(`❌ MAAF, Nilai Anda: ${score} (KKM: ${pos.kkm}).\n\nAnda belum dapat naik level. Silakan baca ulang materi dan coba lagi!`);
+            }
+        }
+
+        // --- ADMIN TABS & MANAGEMENT ---
+        function switchAdminTab(tab) {
+            document.getElementById('adminTab1').className = tab === 'monitoring' ? "flex-1 py-1.5 rounded-lg bg-amber-500 text-slate-950 font-bold" : "flex-1 py-1.5 rounded-lg text-slate-400 hover:text-white";
+            document.getElementById('adminTab2').className = tab === 'editor' ? "flex-1 py-1.5 rounded-lg bg-amber-500 text-slate-950 font-bold" : "flex-1 py-1.5 rounded-lg text-slate-400 hover:text-white";
+            document.getElementById('adminTab3').className = tab === 'firebase' ? "flex-1 py-1.5 rounded-lg bg-amber-500 text-slate-950 font-bold" : "flex-1 py-1.5 rounded-lg text-slate-400 hover:text-white";
+
+            document.getElementById('adminTabContentMonitoring').classList.toggle('hidden', tab !== 'monitoring');
+            document.getElementById('adminTabContentEditor').classList.toggle('hidden', tab !== 'editor');
+            document.getElementById('adminTabContentFirebase').classList.toggle('hidden', tab !== 'firebase');
+        }
+
+        function populateAdminPosSelect() {
+            const select = document.getElementById('adminSelectPos');
+            select.innerHTML = '';
+            posData.forEach(p => {
+                select.innerHTML += `<option value="${p.id}">${p.title} (KKM: ${p.kkm})</option>`;
+            });
+            loadPosEditorData();
+        }
+
+        function loadPosEditorData() {
+            const posId = parseInt(document.getElementById('adminSelectPos').value);
+            const pos = posData.find(p => p.id === posId);
+
+            document.getElementById('editPosTitle').value = pos.title;
+            document.getElementById('editPosKKM').value = pos.kkm;
+            document.getElementById('editPosMateri').value = pos.materi;
+
+            const qList = document.getElementById('adminQuestionsList');
+            qList.innerHTML = '';
+
+            pos.questions.forEach((q, qIdx) => {
+                qList.innerHTML += `
+                    <div class="bg-slate-950 p-2.5 rounded border border-slate-800 space-y-2">
+                        <div class="flex justify-between items-center">
+                            <span class="font-bold text-slate-300">Soal #${qIdx + 1}</span>
+                            <button onclick="removeQuestion(${qIdx})" class="text-red-400 hover:text-red-300 text-[10px]">Hapus</button>
+                        </div>
+                        <input type="text" value="${q.text}" id="q_text_${qIdx}" class="w-full bg-slate-900 border border-slate-700 rounded p-1 text-white">
+                        <div class="grid grid-cols-2 gap-1">
+                            ${q.options.map((opt, oIdx) => `
+                                <input type="text" value="${opt}" id="q_opt_${qIdx}_${oIdx}" class="bg-slate-900 border border-slate-800 rounded p-1 text-[11px] text-slate-300">
+                            `).join('')}
+                        </div>
+                        <div class="flex items-center gap-2">
+                            <span class="text-[10px] text-slate-400">Kunci Jawaban Index (0-3):</span>
+                            <input type="number" min="0" max="3" value="${q.correctAnswer}" id="q_key_${qIdx}" class="w-12 bg-slate-900 border border-slate-700 rounded p-1 text-center font-bold text-amber-400">
+                        </div>
+                    </div>
+                `;
+            });
+        }
+
+        function addNewQuestionToPos() {
+            const posId = parseInt(document.getElementById('adminSelectPos').value);
+            const pos = posData.find(p => p.id === posId);
+            pos.questions.push({
+                id: Date.now(),
+                text: "Soal Baru...",
+                options: ["Opsi A", "Opsi B", "Opsi C", "Opsi D"],
+                correctAnswer: 0
+            });
+            loadPosEditorData();
+        }
+
+        function removeQuestion(qIdx) {
+            const posId = parseInt(document.getElementById('adminSelectPos').value);
+            const pos = posData.find(p => p.id === posId);
+            pos.questions.splice(qIdx, 1);
+            loadPosEditorData();
+        }
+
+        function savePosChanges() {
+            const posId = parseInt(document.getElementById('adminSelectPos').value);
+            const pos = posData.find(p => p.id === posId);
+
+            pos.title = document.getElementById('editPosTitle').value;
+            pos.kkm = parseInt(document.getElementById('editPosKKM').value);
+            pos.materi = document.getElementById('editPosMateri').value;
+
+            pos.questions.forEach((q, qIdx) => {
+                q.text = document.getElementById(`q_text_${qIdx}`).value;
+                q.correctAnswer = parseInt(document.getElementById(`q_key_${qIdx}`).value);
+                for (let oIdx = 0; oIdx < 4; oIdx++) {
+                    q.options[oIdx] = document.getElementById(`q_opt_${qIdx}_${oIdx}`).value;
+                }
+            });
+
+            localStorage.setItem('edu_pos_data', JSON.stringify(posData));
+            if (db) db.collection('settings').doc('pos_data').set({ data: posData });
+
+            alert("✅ Perubahan Pos & Soal berhasil disimpan!");
+            renderMap();
+        }
+
+        // --- OVERRIDE UNLOCK FOR ADMIN ---
+        function adminOverrideUnlock(stdId) {
+            const std = studentsData.find(s => s.id === stdId);
+            if (std && std.unlockedPos < 15) {
+                std.unlockedPos++;
+                saveStudentsData();
+                renderStudentListAdmin();
+                if (std.id === currentStudent.id) {
+                    updateStudentProgressUI();
+                    renderMap();
+                }
+            }
+        }
+
+        function renderStudentListAdmin() {
+            const container = document.getElementById('studentListContainer');
+            container.innerHTML = '';
+
+            studentsData.forEach(std => {
+                container.innerHTML += `
+                    <div class="bg-slate-950 p-2.5 rounded-xl border border-slate-800 flex items-center justify-between text-xs">
+                        <div>
+                            <p class="font-bold text-amber-300">${std.name}</p>
+                            <p class="text-[10px] text-slate-400">Pos Terbuka: <span class="text-emerald-400 font-bold">Pos ${std.unlockedPos}</span></p>
+                        </div>
+                        <button onclick="adminOverrideUnlock('${std.id}')" class="px-2 py-1 bg-amber-500/20 text-amber-300 border border-amber-500/30 rounded text-[10px] font-bold hover:bg-amber-500/40">
+                            +1 Override
+                        </button>
+                    </div>
+                `;
+            });
+        }
+
+        function updateStudentProgressUI() {
+            document.getElementById('currentStudentName').innerText = currentStudent.name;
+            document.getElementById('studentProgressText').innerText = `Pos ${currentStudent.unlockedPos} / 15`;
+        }
+
+        function saveStudentsData() {
+            localStorage.setItem('edu_students_data', JSON.stringify(studentsData));
+            if (db) db.collection('students').doc('list').set({ data: studentsData });
+        }
+
+        // --- FIREBASE INTEGRATION ---
+        function saveFirebaseConfig() {
+            const configText = document.getElementById('firebaseConfigInput').value;
+            try {
+                const config = JSON.parse(configText);
+                localStorage.setItem('firebase_config', JSON.stringify(config));
+                alert("Config Firebase tersimpan. Halaman akan memuat ulang...");
+                location.reload();
+            } catch (e) {
+                alert("❌ JSON Config Firebase tidak valid!");
+            }
+        }
+
+        function initFirebaseFromStorage() {
+            const stored = localStorage.getItem('firebase_config');
+            if (stored) {
+                try {
+                    const config = JSON.parse(stored);
+                    firebase.initializeApp(config);
+                    db = firebase.firestore();
+                    document.getElementById('firebaseStatusDot').className = "w-2 h-2 rounded-full bg-emerald-400 inline-block";
+                    document.getElementById('firebaseStatusText').innerText = "Firebase Connected";
+                } catch (e) {
+                    console.error(e);
+                }
+            }
+        }
+
+        // --- EXPORT TO CSV ---
+        function exportToCSV() {
+            let csv = "ID,Nama Siswa,Pos Terbuka,Nilai Pos 1,Nilai Pos 2,Nilai Pos 3\n";
+            studentsData.forEach(s => {
+                csv += `${s.id},${s.name},${s.unlockedPos},${s.scores[1] || 0},${s.scores[2] || 0},${s.scores[3] || 0}\n`;
+            });
+
+            const blob = new Blob([csv], { type: 'text/csv' });
+            const url = window.URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.setAttribute('href', url);
+            a.setAttribute('download', 'rekap_nilai_pendakian.csv');
+            a.click();
+        }
+    </script>
+</body>
+</html>
