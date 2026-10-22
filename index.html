@@ -8,7 +8,7 @@
     <script src="https://cdn.tailwindcss.com"></script>
     <!-- FontAwesome Icons -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-    <!-- Google Fonts: Montserrat & Luckiest Guy -->
+    <!-- Google Fonts -->
     <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;600;700;800&family=Luckiest+Guy&display=swap" rel="stylesheet">
     <!-- Firebase SDKs -->
     <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
@@ -58,7 +58,7 @@
         <div class="max-w-7xl mx-auto flex flex-wrap items-center justify-between gap-3">
             <div class="flex items-center gap-3">
                 <div class="w-10 h-10 rounded-full bg-gradient-to-tr from-amber-600 to-amber-400 flex items-center justify-center shadow-lg border border-amber-300">
-                    <i class="fa-solid me-0 fa-mountain text-slate-900 text-xl"></i>
+                    <i class="fa-solid fa-mountain text-slate-900 text-xl"></i>
                 </div>
                 <div>
                     <h1 class="font-game text-xl text-amber-400 tracking-wider">EDU-EXPEDITION</h1>
@@ -69,7 +69,7 @@
                 </div>
             </div>
 
-            <!-- ROLE SWITCH TOGGLE (SANGAT JELAS) -->
+            <!-- ROLE SWITCH TOGGLE -->
             <div class="flex items-center bg-slate-800 p-1.5 rounded-xl border border-slate-700 shadow-inner">
                 <span class="text-xs font-bold px-2 text-slate-400 uppercase hidden sm:inline">Pilih Peran:</span>
                 <button id="btnRoleSiswa" onclick="setRole('siswa')" class="px-4 py-1.5 rounded-lg text-xs font-extrabold transition-all duration-200 flex items-center gap-2 bg-amber-500 text-slate-950 shadow-md">
@@ -91,10 +91,9 @@
     <!-- MAIN CONTAINER -->
     <main class="flex-grow max-w-7xl w-full mx-auto p-4 sm:p-6 grid grid-cols-1 lg:grid-cols-3 gap-6">
 
-        <!-- LEFT PANEL: MAP PENDAKIAN (2 COLS) -->
+        <!-- LEFT PANEL: MAP PENDAKIAN -->
         <section class="lg:col-span-2 flex flex-col gap-4">
             
-            <!-- Mountain Stats Header -->
             <div class="wood-panel rounded-2xl p-4 flex flex-wrap items-center justify-between gap-4 text-amber-100">
                 <div>
                     <h2 class="font-game text-2xl text-amber-300 flex items-center gap-2">
@@ -114,19 +113,12 @@
                 </div>
             </div>
 
-            <!-- VISUAL MOUNTAIN TRAIL CONTAINER -->
             <div class="relative bg-slate-950/60 rounded-2xl border-2 border-slate-700/60 p-4 sm:p-6 overflow-hidden min-h-[600px] flex flex-col justify-between">
-                
-                <!-- Background Mountain SVG Graphics -->
                 <svg class="absolute inset-0 w-full h-full pointer-events-none opacity-20" xmlns="http://www.w3.org/2000/svg">
-                    <!-- Path line connecting posts -->
                     <path id="svgTrailPath" class="trail-line" d="M 100 550 Q 250 500 400 520 T 700 450 T 300 380 T 600 300 T 200 220 T 500 120 T 400 50" fill="transparent" stroke-width="4"/>
                 </svg>
 
-                <!-- Zone Indicators -->
                 <div class="relative z-10 space-y-8">
-                    
-                    <!-- ZONA 3: TEBING TERJAL & PUNCAK -->
                     <div class="border-l-4 border-red-500 pl-3">
                         <span class="text-[10px] font-extrabold tracking-widest text-red-400 bg-red-950/80 px-2 py-0.5 rounded border border-red-800 uppercase">
                             Zona 3: Tebing Terjal & Puncak (2.100 - 3.100 mdpl)
@@ -134,7 +126,6 @@
                         <div id="zone3Posts" class="grid grid-cols-2 sm:grid-cols-5 gap-3 mt-3"></div>
                     </div>
 
-                    <!-- ZONA 2: HUTAN BELANTARA -->
                     <div class="border-l-4 border-amber-500 pl-3">
                         <span class="text-[10px] font-extrabold tracking-widest text-amber-400 bg-amber-950/80 px-2 py-0.5 rounded border border-amber-800 uppercase">
                             Zona 2: Hutan Belantara (1.300 - 1.900 mdpl)
@@ -142,17 +133,14 @@
                         <div id="zone2Posts" class="grid grid-cols-2 sm:grid-cols-5 gap-3 mt-3"></div>
                     </div>
 
-                    <!-- ZONA 1: LERENG GUNUNG -->
                     <div class="border-l-4 border-emerald-500 pl-3">
                         <span class="text-[10px] font-extrabold tracking-widest text-emerald-400 bg-emerald-950/80 px-2 py-0.5 rounded border border-emerald-800 uppercase">
                             Zona 1: Lereng Gunung (500 - 1.100 mdpl)
                         </span>
                         <div id="zone1Posts" class="grid grid-cols-2 sm:grid-cols-5 gap-3 mt-3"></div>
                     </div>
-
                 </div>
 
-                <!-- Map Legend -->
                 <div class="relative z-10 mt-6 pt-4 border-t border-slate-800 flex flex-wrap items-center justify-between text-xs text-slate-400 gap-2">
                     <div class="flex items-center gap-4">
                         <span class="flex items-center gap-1.5"><i class="fa-solid fa-lock text-slate-500"></i> Terkunci</span>
@@ -164,12 +152,10 @@
             </div>
         </section>
 
-        <!-- RIGHT PANEL: SISWA INTERACTION OR ADMIN DASHBOARD -->
+        <!-- RIGHT PANEL -->
         <section class="lg:col-span-1 flex flex-col gap-4">
             
-            <!-- PANEL MODE SISWA: DETAIL POS & KUIS -->
             <div id="siswaPanel" class="bg-slate-900 border border-slate-800 rounded-2xl p-5 shadow-2xl flex flex-col h-full">
-                
                 <div id="posDefaultState" class="my-auto text-center py-12 px-4">
                     <div class="w-16 h-16 mx-auto rounded-full bg-slate-800 border border-slate-700 flex items-center justify-center text-amber-400 text-2xl mb-3">
                         <i class="fa-solid fa-person-hiking animate-bounce"></i>
@@ -178,10 +164,7 @@
                     <p class="text-xs text-slate-400 mt-2">Klik salah satu pos yang terbuka di peta untuk mempelajari materi dan mengerjakan tantangan kuis.</p>
                 </div>
 
-                <!-- Pos Active Card Content (Hidden initially) -->
                 <div id="posActiveContent" class="hidden flex-col h-full">
-                    
-                    <!-- Header Pos Detail -->
                     <div class="border-b border-slate-800 pb-3 mb-4 flex items-center justify-between">
                         <div>
                             <span id="posDetailZone" class="text-[10px] uppercase font-bold text-amber-400 tracking-wider block">ZONA 1</span>
@@ -193,7 +176,6 @@
                         </div>
                     </div>
 
-                    <!-- Tabs Materi / Kuis -->
                     <div class="flex border-b border-slate-800 mb-4">
                         <button id="btnTabMateri" onclick="switchSiswaTab('materi')" class="flex-1 py-2 text-xs font-bold text-amber-400 border-b-2 border-amber-400">
                             <i class="fa-solid fa-book-open mr-1"></i> Materi & Panduan
@@ -203,36 +185,26 @@
                         </button>
                     </div>
 
-                    <!-- Content Tab: MATERI -->
                     <div id="tabMateriContent" class="flex-grow space-y-3 overflow-y-auto max-h-[400px] pr-1">
-                        <div class="bg-slate-950 p-3.5 rounded-xl border border-slate-800 text-xs text-slate-300 leading-relaxed" id="posMateriText">
-                            <!-- Materi text inserted dynamically -->
-                        </div>
+                        <div class="bg-slate-950 p-3.5 rounded-xl border border-slate-800 text-xs text-slate-300 leading-relaxed" id="posMateriText"></div>
                         <button onclick="switchSiswaTab('kuis')" class="w-full py-3 rounded-xl bg-gradient-to-r from-amber-500 to-amber-600 hover:from-amber-400 hover:to-amber-500 text-slate-950 font-extrabold text-xs shadow-lg transition-all flex items-center justify-center gap-2">
                             MULAI TANTANGAN KUIS <i class="fa-solid fa-arrow-right"></i>
                         </button>
                     </div>
 
-                    <!-- Content Tab: KUIS -->
                     <div id="tabKuisContent" class="hidden flex-grow flex-col justify-between">
-                        <div id="quizContainer" class="space-y-4 overflow-y-auto max-h-[420px] pr-1">
-                            <!-- Quiz questions rendered dynamically -->
-                        </div>
-
+                        <div id="quizContainer" class="space-y-4 overflow-y-auto max-h-[420px] pr-1"></div>
                         <div class="mt-4 pt-3 border-t border-slate-800">
                             <button id="btnSubmitQuiz" onclick="submitQuiz()" class="w-full py-3 rounded-xl bg-emerald-500 hover:bg-emerald-400 text-slate-950 font-extrabold text-xs shadow-lg transition-all flex items-center justify-center gap-2">
-                                <i class="fa-solid fa-paper-plane"></i> KIRIM JAWABAN & NAIL LEVEL
+                                <i class="fa-solid fa-paper-plane"></i> KIRIM JAWABAN & NAIK LEVEL
                             </button>
                         </div>
                     </div>
-
                 </div>
-
             </div>
 
-            <!-- PANEL MODE ADMIN: DASHBOARD KELOLA -->
+            <!-- ADMIN PANEL -->
             <div id="adminPanel" class="hidden bg-slate-900 border border-slate-800 rounded-2xl p-5 shadow-2xl flex-col h-full">
-                
                 <div class="border-b border-slate-800 pb-3 mb-4">
                     <h3 class="font-game text-xl text-red-400 flex items-center gap-2">
                         <i class="fa-solid fa-sliders"></i> Panel Kelola Admin
@@ -240,7 +212,6 @@
                     <p class="text-xs text-slate-400">Atur kuis, KKM, override siswa, dan koneksi Firebase.</p>
                 </div>
 
-                <!-- Admin Sub-tabs -->
                 <div class="flex gap-1 bg-slate-950 p-1 rounded-xl border border-slate-800 mb-4 text-[11px] font-bold">
                     <button onclick="switchAdminTab('monitoring')" id="adminTab1" class="flex-1 py-1.5 rounded-lg bg-amber-500 text-slate-950">
                         <i class="fa-solid fa-users"></i> Siswa
@@ -253,7 +224,6 @@
                     </button>
                 </div>
 
-                <!-- Admin Tab 1: MONITORING SISWA & OVERRIDE -->
                 <div id="adminTabContentMonitoring" class="space-y-4">
                     <div class="flex justify-between items-center text-xs">
                         <span class="font-bold text-slate-300">Daftar Progres Siswa:</span>
@@ -261,21 +231,14 @@
                             <i class="fa-solid fa-file-excel mr-1"></i> Ekspor CSV
                         </button>
                     </div>
-
-                    <div id="studentListContainer" class="space-y-2 max-h-[380px] overflow-y-auto pr-1">
-                        <!-- Student list rendered dynamically -->
-                    </div>
+                    <div id="studentListContainer" class="space-y-2 max-h-[380px] overflow-y-auto pr-1"></div>
                 </div>
 
-                <!-- Admin Tab 2: EDITOR POS & SOAL DINAMIS -->
                 <div id="adminTabContentEditor" class="hidden space-y-3 overflow-y-auto max-h-[420px] pr-1 text-xs">
                     <div>
                         <label class="block font-bold text-slate-300 mb-1">Pilih Pos yang Ingin Diedit:</label>
-                        <select id="adminSelectPos" onchange="loadPosEditorData()" class="w-full bg-slate-950 border border-slate-800 rounded-lg p-2 text-amber-300 font-bold focus:outline-none focus:border-amber-500">
-                            <!-- Options 1-15 generated dynamically -->
-                        </select>
+                        <select id="adminSelectPos" onchange="loadPosEditorData()" class="w-full bg-slate-950 border border-slate-800 rounded-lg p-2 text-amber-300 font-bold focus:outline-none focus:border-amber-500"></select>
                     </div>
-
                     <div class="grid grid-cols-2 gap-2">
                         <div>
                             <label class="block text-slate-400 mb-1">Nama Pos:</label>
@@ -286,56 +249,36 @@
                             <input id="editPosKKM" type="number" class="w-full bg-slate-950 border border-slate-800 rounded p-2 text-white">
                         </div>
                     </div>
-
                     <div>
                         <label class="block text-slate-400 mb-1">Materi Pembelajaran Pos:</label>
                         <textarea id="editPosMateri" rows="3" class="w-full bg-slate-950 border border-slate-800 rounded p-2 text-white text-xs"></textarea>
                     </div>
-
                     <div class="pt-2 border-t border-slate-800">
                         <div class="flex justify-between items-center mb-2">
                             <span class="font-bold text-amber-400">Daftar Soal Kuis Pos Ini:</span>
-                            <button onclick="addNewQuestionToPos()" class="text-[10px] bg-emerald-600 hover:bg-emerald-500 px-2 py-1 rounded text-white font-bold">
-                                + Tambah Soal
-                            </button>
+                            <button onclick="addNewQuestionToPos()" class="text-[10px] bg-emerald-600 hover:bg-emerald-500 px-2 py-1 rounded text-white font-bold">+ Tambah Soal</button>
                         </div>
-                        <div id="adminQuestionsList" class="space-y-3">
-                            <!-- Questions editor dynamic -->
-                        </div>
+                        <div id="adminQuestionsList" class="space-y-3"></div>
                     </div>
-
                     <button onclick="savePosChanges()" class="w-full py-2.5 bg-amber-500 hover:bg-amber-400 text-slate-950 font-extrabold rounded-lg shadow mt-2">
                         <i class="fa-solid fa-floppy-disk mr-1"></i> SIMPAN PERUBAHAN POS
                     </button>
                 </div>
 
-                <!-- Admin Tab 3: FIREBASE CONFIGURATION -->
                 <div id="adminTabContentFirebase" class="hidden space-y-3 text-xs">
                     <p class="text-slate-400 leading-relaxed">
-                        Masukkan konfigurasi **Firebase Firestore** Anda di sini untuk menyimpan data kuis dan progres siswa secara cloud real-time.
+                        Tempelkan konfigurasi Firebase Anda di sini. Anda bisa langsung paste seluruh teks (termasuk <code>const firebaseConfig = ...</code> atau JSON murni).
                     </p>
-
                     <div>
-                        <label class="block font-bold text-slate-300 mb-1">JSON Config Firebase:</label>
-                        <textarea id="firebaseConfigInput" rows="6" placeholder='{
-  "apiKey": "AIzaSy...",
-  "authDomain": "app.firebaseapp.com",
-  "projectId": "app-id",
-  "storageBucket": "app.appspot.com",
-  "messagingSenderId": "12345",
-  "appId": "1:12345:web:123"
-}' class="w-full bg-slate-950 border border-slate-800 rounded p-2 font-mono text-[10px] text-amber-300 focus:outline-none focus:border-amber-500"></textarea>
+                        <label class="block font-bold text-slate-300 mb-1">Config Firebase:</label>
+                        <textarea id="firebaseConfigInput" rows="7" placeholder="Paste kode dari Firebase di sini..." class="w-full bg-slate-950 border border-slate-800 rounded p-2 font-mono text-[10px] text-amber-300 focus:outline-none focus:border-amber-500"></textarea>
                     </div>
-
                     <button onclick="saveFirebaseConfig()" class="w-full py-2.5 bg-sky-600 hover:bg-sky-500 text-white font-extrabold rounded-lg shadow">
                         <i class="fa-solid fa-plug mr-1"></i> SIMPAN & KONEKSIKAN FIREBASE
                     </button>
                 </div>
-
             </div>
-
         </section>
-
     </main>
 
     <!-- FOOTER -->
@@ -343,9 +286,8 @@
         Edu-Expedition 15 Pos Gunung &copy; 2026 — Sistem Gamifikasi Pembelajaran & Penilaian Berbasis Petualangan Alam.
     </footer>
 
-    <!-- JAVASCRIPT LOGIC -->
+    <!-- SCRIPT -->
     <script>
-        // --- DATA DEFAULTS (15 POS & SOAL INITIAL) ---
         const DEFAULT_POS_DATA = Array.from({ length: 15 }, (_, i) => {
             const posNum = i + 1;
             let zone = 1;
@@ -386,21 +328,18 @@
             return names[num - 1] || `Pos ${num}`;
         }
 
-        // --- MOCK STUDENTS DATA ---
         let studentsData = [
             { id: "std_1", name: "Ahmad Pendaki", unlockedPos: 1, scores: {} },
             { id: "std_2", name: "Siti Petualang", unlockedPos: 3, scores: { 1: 100, 2: 90 } },
             { id: "std_3", name: "Budi Pramuka", unlockedPos: 5, scores: { 1: 85, 2: 80, 3: 100, 4: 90 } }
         ];
 
-        // --- APP STATES ---
-        let currentRole = 'siswa'; // 'siswa' or 'admin'
+        let currentRole = 'siswa';
         let currentStudent = studentsData[0];
         let posData = JSON.parse(localStorage.getItem('edu_pos_data')) || DEFAULT_POS_DATA;
         let selectedPosId = null;
-        let db = null; // Firebase Firestore db reference
+        let db = null;
 
-        // --- INITIALIZATION ---
         window.onload = function() {
             initFirebaseFromStorage();
             renderMap();
@@ -409,7 +348,6 @@
             renderStudentListAdmin();
         };
 
-        // --- ROLE SWITCHING ---
         function setRole(role) {
             currentRole = role;
             const btnSiswa = document.getElementById('btnRoleSiswa');
@@ -433,7 +371,6 @@
             }
         }
 
-        // --- RENDER MOUNTAIN TRAIL MAP ---
         function renderMap() {
             const z1Container = document.getElementById('zone1Posts');
             const z2Container = document.getElementById('zone2Posts');
@@ -479,7 +416,6 @@
             });
         }
 
-        // --- SELECT POS TO VIEW MATERI/KUIS ---
         function selectPos(posId) {
             if (posId > currentStudent.unlockedPos) return;
 
@@ -523,7 +459,6 @@
             }
         }
 
-        // --- RENDER QUIZ FOR STUDENT ---
         function renderQuiz(pos) {
             const container = document.getElementById('quizContainer');
             container.innerHTML = '';
@@ -548,7 +483,6 @@
             });
         }
 
-        // --- SUBMIT QUIZ & PASS/FAIL GATE ---
         function submitQuiz() {
             const pos = posData.find(p => p.id === selectedPosId);
             let correctCount = 0;
@@ -577,7 +511,6 @@
             }
         }
 
-        // --- ADMIN TABS & MANAGEMENT ---
         function switchAdminTab(tab) {
             document.getElementById('adminTab1').className = tab === 'monitoring' ? "flex-1 py-1.5 rounded-lg bg-amber-500 text-slate-950 font-bold" : "flex-1 py-1.5 rounded-lg text-slate-400 hover:text-white";
             document.getElementById('adminTab2').className = tab === 'editor' ? "flex-1 py-1.5 rounded-lg bg-amber-500 text-slate-950 font-bold" : "flex-1 py-1.5 rounded-lg text-slate-400 hover:text-white";
@@ -672,7 +605,6 @@
             renderMap();
         }
 
-        // --- OVERRIDE UNLOCK FOR ADMIN ---
         function adminOverrideUnlock(stdId) {
             const std = studentsData.find(s => s.id === stdId);
             if (std && std.unlockedPos < 15) {
@@ -715,16 +647,27 @@
             if (db) db.collection('students').doc('list').set({ data: studentsData });
         }
 
-        // --- FIREBASE INTEGRATION ---
+        // --- FIREBASE SETUP FLEKSIBEL (Bisa Parse Code JS Langsung) ---
         function saveFirebaseConfig() {
-            const configText = document.getElementById('firebaseConfigInput').value;
+            let rawInput = document.getElementById('firebaseConfigInput').value.trim();
             try {
-                const config = JSON.parse(configText);
+                // Jika user paste lengkap ada "const firebaseConfig = { ... };"
+                if (rawInput.includes('firebaseConfig')) {
+                    rawInput = rawInput.replace(/const\s+firebaseConfig\s*=\s*/, '');
+                    rawInput = rawInput.replace(/;\s*$/, '');
+                }
+                
+                // Ubah format objek JS biasa menjadi JSON valid dengan memberikan tanda kutip pada key
+                let jsonStr = rawInput
+                    .replace(/([{,]\s*)([a-zA-Z0-9_]+)(\s*:\s*)/g, '$1"$2"$3')
+                    .replace(/,\s*}/g, '}');
+
+                const config = JSON.parse(jsonStr);
                 localStorage.setItem('firebase_config', JSON.stringify(config));
-                alert("Config Firebase tersimpan. Halaman akan memuat ulang...");
+                alert("🎉 Konfigurasi Firebase Berhasil Disimpan! Halaman akan dimuat ulang.");
                 location.reload();
             } catch (e) {
-                alert("❌ JSON Config Firebase tidak valid!");
+                alert("❌ Format masih belum terbaca. Coba copy-paste ulang persis dari panel Firebase Anda.");
             }
         }
 
@@ -743,7 +686,6 @@
             }
         }
 
-        // --- EXPORT TO CSV ---
         function exportToCSV() {
             let csv = "ID,Nama Siswa,Pos Terbuka,Nilai Pos 1,Nilai Pos 2,Nilai Pos 3\n";
             studentsData.forEach(s => {
