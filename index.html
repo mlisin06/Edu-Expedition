@@ -54,7 +54,7 @@
 <body class="min-h-screen flex flex-col mountain-bg selection:bg-amber-500 selection:text-slate-900">
 
     <!-- TOP HEADER & ROLE SWITCHER -->
-    <header class="sticky top-0 z-50 bg-slate-900/90 backdrop-blur-md border-b border-amber-500/30 px-4 py-3 shadow-xl">
+    <header class="sticky top-0 z-40 bg-slate-900/90 backdrop-blur-md border-b border-amber-500/30 px-4 py-3 shadow-xl">
         <div class="max-w-7xl mx-auto flex flex-wrap items-center justify-between gap-3">
             <div class="flex items-center gap-3">
                 <div class="w-10 h-10 rounded-full bg-gradient-to-tr from-amber-600 to-amber-400 flex items-center justify-center shadow-lg border border-amber-300">
@@ -72,10 +72,10 @@
             <!-- ROLE SWITCH TOGGLE -->
             <div class="flex items-center bg-slate-800 p-1.5 rounded-xl border border-slate-700 shadow-inner">
                 <span class="text-xs font-bold px-2 text-slate-400 uppercase hidden sm:inline">Pilih Peran:</span>
-                <button id="btnRoleSiswa" onclick="setRole('siswa')" class="px-4 py-1.5 rounded-lg text-xs font-extrabold transition-all duration-200 flex items-center gap-2 bg-amber-500 text-slate-950 shadow-md">
+                <button id="btnRoleSiswa" onclick="switchRoleRequest('siswa')" class="px-4 py-1.5 rounded-lg text-xs font-extrabold transition-all duration-200 flex items-center gap-2 bg-amber-500 text-slate-950 shadow-md">
                     <i class="fa-solid fa-user-graduate"></i> SISWA
                 </button>
-                <button id="btnRoleAdmin" onclick="setRole('admin')" class="px-4 py-1.5 rounded-lg text-xs font-extrabold text-slate-400 hover:text-white transition-all duration-200 flex items-center gap-2">
+                <button id="btnRoleAdmin" onclick="switchRoleRequest('admin')" class="px-4 py-1.5 rounded-lg text-xs font-extrabold text-slate-400 hover:text-white transition-all duration-200 flex items-center gap-2">
                     <i class="fa-solid fa-user-gear"></i> ADMIN
                 </button>
             </div>
@@ -84,8 +84,8 @@
 
     <!-- ADMIN BANNER INDICATOR -->
     <div id="adminBanner" class="hidden bg-gradient-to-r from-red-900/90 via-amber-900/90 to-red-900/90 border-b border-red-500/50 px-4 py-2 text-center text-xs font-bold text-amber-200 shadow-inner">
-        <i class="fa-solid fa-triangle-exclamation text-amber-400 animate-bounce mr-2"></i>
-        MODE ADMIN AKTIF: Anda memiliki wewenang mengelola kuis, KKM, materi, dan membuka pos siswa.
+        <i class="fa-solid fa-shield-halved text-amber-400 animate-pulse mr-2"></i>
+        MODE ADMIN AKTIF: Anda memiliki akses mengelola pos, kuis, KKM, dan progres seluruh siswa.
     </div>
 
     <!-- MAIN CONTAINER -->
@@ -94,31 +94,37 @@
         <!-- LEFT PANEL: MAP PENDAKIAN -->
         <section class="lg:col-span-2 flex flex-col gap-4">
             
+            <!-- Mountain Header Card -->
             <div class="wood-panel rounded-2xl p-4 flex flex-wrap items-center justify-between gap-4 text-amber-100">
                 <div>
                     <h2 class="font-game text-2xl text-amber-300 flex items-center gap-2">
-                        <i class="fa-solid fa-compass text-amber-400"></i> Peta Pendakian Gunung Kawi
+                        <i class="fa-solid fa-compass text-amber-400"></i> Peta Pendakian 15 Pos
                     </h2>
-                    <p class="text-xs text-amber-200/80">Selesaikan kuis di setiap pos untuk melanjutkan pendakian hingga Puncak (3.100 mdpl)</p>
+                    <p class="text-xs text-amber-200/80">Selesaikan tantangan di tiap pos untuk terus menanjak hingga Puncak (3.100 mdpl)</p>
                 </div>
                 <div class="flex items-center gap-3 text-xs">
                     <div class="bg-black/40 px-3 py-1.5 rounded-lg border border-amber-500/20">
-                        <span class="text-slate-400 block">Siswa Aktif:</span>
-                        <span id="currentStudentName" class="font-bold text-amber-300">Ahmad Pendaki</span>
+                        <span class="text-slate-400 block text-[10px]">Pendaki Aktif:</span>
+                        <div class="flex items-center gap-2">
+                            <span id="currentStudentName" class="font-bold text-amber-300">Belum Masuk</span>
+                            <button onclick="openStudentModal()" class="text-[10px] text-amber-400 hover:text-amber-200 underline">Ganti</button>
+                        </div>
                     </div>
                     <div class="bg-black/40 px-3 py-1.5 rounded-lg border border-amber-500/20">
-                        <span class="text-slate-400 block">Progres Pos:</span>
+                        <span class="text-slate-400 block text-[10px]">Progres Pendakian:</span>
                         <span id="studentProgressText" class="font-bold text-emerald-400">Pos 1 / 15</span>
                     </div>
                 </div>
             </div>
 
+            <!-- VISUAL MAP CONTAINER -->
             <div class="relative bg-slate-950/60 rounded-2xl border-2 border-slate-700/60 p-4 sm:p-6 overflow-hidden min-h-[600px] flex flex-col justify-between">
                 <svg class="absolute inset-0 w-full h-full pointer-events-none opacity-20" xmlns="http://www.w3.org/2000/svg">
                     <path id="svgTrailPath" class="trail-line" d="M 100 550 Q 250 500 400 520 T 700 450 T 300 380 T 600 300 T 200 220 T 500 120 T 400 50" fill="transparent" stroke-width="4"/>
                 </svg>
 
                 <div class="relative z-10 space-y-8">
+                    <!-- ZONA 3 -->
                     <div class="border-l-4 border-red-500 pl-3">
                         <span class="text-[10px] font-extrabold tracking-widest text-red-400 bg-red-950/80 px-2 py-0.5 rounded border border-red-800 uppercase">
                             Zona 3: Tebing Terjal & Puncak (2.100 - 3.100 mdpl)
@@ -126,6 +132,7 @@
                         <div id="zone3Posts" class="grid grid-cols-2 sm:grid-cols-5 gap-3 mt-3"></div>
                     </div>
 
+                    <!-- ZONA 2 -->
                     <div class="border-l-4 border-amber-500 pl-3">
                         <span class="text-[10px] font-extrabold tracking-widest text-amber-400 bg-amber-950/80 px-2 py-0.5 rounded border border-amber-800 uppercase">
                             Zona 2: Hutan Belantara (1.300 - 1.900 mdpl)
@@ -133,6 +140,7 @@
                         <div id="zone2Posts" class="grid grid-cols-2 sm:grid-cols-5 gap-3 mt-3"></div>
                     </div>
 
+                    <!-- ZONA 1 -->
                     <div class="border-l-4 border-emerald-500 pl-3">
                         <span class="text-[10px] font-extrabold tracking-widest text-emerald-400 bg-emerald-950/80 px-2 py-0.5 rounded border border-emerald-800 uppercase">
                             Zona 1: Lereng Gunung (500 - 1.100 mdpl)
@@ -141,29 +149,32 @@
                     </div>
                 </div>
 
+                <!-- Legend -->
                 <div class="relative z-10 mt-6 pt-4 border-t border-slate-800 flex flex-wrap items-center justify-between text-xs text-slate-400 gap-2">
                     <div class="flex items-center gap-4">
                         <span class="flex items-center gap-1.5"><i class="fa-solid fa-lock text-slate-500"></i> Terkunci</span>
                         <span class="flex items-center gap-1.5"><i class="fa-solid fa-campground text-amber-400"></i> Aktif/Terbuka</span>
                         <span class="flex items-center gap-1.5"><i class="fa-solid fa-flag-checkered text-emerald-400"></i> Selesai</span>
                     </div>
-                    <span class="text-[11px] text-slate-500">Klik Pos untuk membuka Materi & Kuis</span>
+                    <span class="text-[11px] text-slate-500">Klik Pos untuk mempelajari Materi & Kuis</span>
                 </div>
             </div>
         </section>
 
-        <!-- RIGHT PANEL -->
+        <!-- RIGHT PANEL: SISWA ATU ADMIN PANEL -->
         <section class="lg:col-span-1 flex flex-col gap-4">
             
+            <!-- PANEL MODE SISWA -->
             <div id="siswaPanel" class="bg-slate-900 border border-slate-800 rounded-2xl p-5 shadow-2xl flex flex-col h-full">
                 <div id="posDefaultState" class="my-auto text-center py-12 px-4">
                     <div class="w-16 h-16 mx-auto rounded-full bg-slate-800 border border-slate-700 flex items-center justify-center text-amber-400 text-2xl mb-3">
                         <i class="fa-solid fa-person-hiking animate-bounce"></i>
                     </div>
                     <h3 class="font-game text-xl text-slate-200">Pilih Pos Pendakian</h3>
-                    <p class="text-xs text-slate-400 mt-2">Klik salah satu pos yang terbuka di peta untuk mempelajari materi dan mengerjakan tantangan kuis.</p>
+                    <p class="text-xs text-slate-400 mt-2">Klik salah satu pos yang sudah terbuka di peta untuk mempelajari materi dan mengerjakan tantangan kuis.</p>
                 </div>
 
+                <!-- Active Pos Card Content -->
                 <div id="posActiveContent" class="hidden flex-col h-full">
                     <div class="border-b border-slate-800 pb-3 mb-4 flex items-center justify-between">
                         <div>
@@ -203,7 +214,7 @@
                 </div>
             </div>
 
-            <!-- ADMIN PANEL -->
+            <!-- PANEL MODE ADMIN -->
             <div id="adminPanel" class="hidden bg-slate-900 border border-slate-800 rounded-2xl p-5 shadow-2xl flex-col h-full">
                 <div class="border-b border-slate-800 pb-3 mb-4">
                     <h3 class="font-game text-xl text-red-400 flex items-center gap-2">
@@ -224,6 +235,7 @@
                     </button>
                 </div>
 
+                <!-- Admin Tab 1: Monitoring -->
                 <div id="adminTabContentMonitoring" class="space-y-4">
                     <div class="flex justify-between items-center text-xs">
                         <span class="font-bold text-slate-300">Daftar Progres Siswa:</span>
@@ -234,6 +246,7 @@
                     <div id="studentListContainer" class="space-y-2 max-h-[380px] overflow-y-auto pr-1"></div>
                 </div>
 
+                <!-- Admin Tab 2: Editor Pos & Soal -->
                 <div id="adminTabContentEditor" class="hidden space-y-3 overflow-y-auto max-h-[420px] pr-1 text-xs">
                     <div>
                         <label class="block font-bold text-slate-300 mb-1">Pilih Pos yang Ingin Diedit:</label>
@@ -265,9 +278,10 @@
                     </button>
                 </div>
 
+                <!-- Admin Tab 3: Firebase Config -->
                 <div id="adminTabContentFirebase" class="hidden space-y-3 text-xs">
                     <p class="text-slate-400 leading-relaxed">
-                        Tempelkan konfigurasi Firebase Anda di sini. Anda bisa langsung paste seluruh teks (termasuk <code>const firebaseConfig = ...</code> atau JSON murni).
+                        Tempelkan konfigurasi Firebase Anda di sini. Anda bisa langsung paste seluruh teks dari Firebase Console.
                     </p>
                     <div>
                         <label class="block font-bold text-slate-300 mb-1">Config Firebase:</label>
@@ -281,13 +295,78 @@
         </section>
     </main>
 
+    <!-- MODAL POPUP: MASUK SISWA -->
+    <div id="modalStudentEntry" class="fixed inset-0 z-50 bg-slate-950/80 backdrop-blur-md flex items-center justify-center p-4">
+        <div class="bg-slate-900 border-2 border-amber-500/50 rounded-2xl max-w-md w-full p-6 shadow-2xl relative overflow-hidden">
+            <div class="text-center mb-6">
+                <div class="w-16 h-16 bg-gradient-to-tr from-amber-600 to-amber-400 rounded-full flex items-center justify-center mx-auto mb-3 text-slate-950 text-2xl shadow-lg">
+                    <i class="fa-solid fa-person-hiking"></i>
+                </div>
+                <h3 class="font-game text-2xl text-amber-400">PETUALANGAN PENDAKIAN</h3>
+                <p class="text-xs text-slate-400 mt-1">Masukkan nama Anda untuk mulai mendaki 15 Pos Gunung</p>
+            </div>
+
+            <!-- Tab Masuk Baru / Pilih Akun -->
+            <div class="flex border-b border-slate-800 mb-4 text-xs font-bold">
+                <button id="btnModalTabNew" onclick="switchModalTab('new')" class="flex-1 py-2 text-amber-400 border-b-2 border-amber-400">Siswa Baru</button>
+                <button id="btnModalTabSelect" onclick="switchModalTab('select')" class="flex-1 py-2 text-slate-400 hover:text-white">Pilih Nama Terdaftar</button>
+            </div>
+
+            <!-- Content: Siswa Baru -->
+            <div id="modalTabContentNew" class="space-y-4">
+                <div>
+                    <label class="block text-xs text-slate-300 font-bold mb-1">Nama Lengkap Siswa:</label>
+                    <input id="inputNewStudentName" type="text" placeholder="Contoh: Budi Pratama" class="w-full bg-slate-950 border border-slate-700 rounded-xl p-3 text-xs text-white focus:outline-none focus:border-amber-500">
+                </div>
+                <div>
+                    <label class="block text-xs text-slate-300 font-bold mb-1">Kelas / No. Absen (Opsional):</label>
+                    <input id="inputNewStudentClass" type="text" placeholder="Contoh: Kelas 5A / 08" class="w-full bg-slate-950 border border-slate-700 rounded-xl p-3 text-xs text-white focus:outline-none focus:border-amber-500">
+                </div>
+                <button onclick="registerNewStudent()" class="w-full py-3 bg-gradient-to-r from-amber-500 to-amber-600 hover:from-amber-400 hover:to-amber-500 text-slate-950 font-extrabold text-xs rounded-xl shadow-lg">
+                    MULAI PENDAKIAN 🚀
+                </button>
+            </div>
+
+            <!-- Content: Pilih Nama -->
+            <div id="modalTabContentSelect" class="hidden space-y-4">
+                <div>
+                    <label class="block text-xs text-slate-300 font-bold mb-1">Pilih Nama Anda:</label>
+                    <select id="selectExistingStudent" class="w-full bg-slate-950 border border-slate-700 rounded-xl p-3 text-xs text-amber-300 font-bold focus:outline-none focus:border-amber-500"></select>
+                </div>
+                <button onclick="loginExistingStudent()" class="w-full py-3 bg-emerald-500 hover:bg-emerald-400 text-slate-950 font-extrabold text-xs rounded-xl shadow-lg">
+                    LANJUTKAN PENDAKIAN 🏔️
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- MODAL POPUP: PASSWORD ADMIN -->
+    <div id="modalAdminAuth" class="hidden fixed inset-0 z-50 bg-slate-950/80 backdrop-blur-md flex items-center justify-center p-4">
+        <div class="bg-slate-900 border-2 border-red-500/50 rounded-2xl max-w-xs w-full p-5 shadow-2xl text-center">
+            <div class="w-12 h-12 bg-red-900/50 border border-red-500 rounded-full flex items-center justify-center mx-auto mb-3 text-red-400 text-xl">
+                <i class="fa-solid fa-lock"></i>
+            </div>
+            <h4 class="font-game text-lg text-red-400">AKSES ADMIN</h4>
+            <p class="text-[11px] text-slate-400 mt-1 mb-4">Masukkan Kata Sandi Khusus Admin</p>
+            
+            <input id="inputAdminPassword" type="password" placeholder="Masukkan Password..." class="w-full bg-slate-950 border border-slate-700 rounded-lg p-2.5 text-center text-xs text-white focus:outline-none focus:border-red-500 mb-3">
+            
+            <div class="flex gap-2">
+                <button onclick="closeAdminAuthModal()" class="flex-1 py-2 bg-slate-800 hover:bg-slate-700 text-slate-300 text-xs font-bold rounded-lg">Batal</button>
+                <button onclick="verifyAdminPassword()" class="flex-1 py-2 bg-red-600 hover:bg-red-500 text-white text-xs font-bold rounded-lg">Masuk</button>
+            </div>
+        </div>
+    </div>
+
     <!-- FOOTER -->
     <footer class="mt-auto border-t border-slate-800 bg-slate-950/80 px-4 py-3 text-center text-xs text-slate-500">
         Edu-Expedition 15 Pos Gunung &copy; 2026 — Sistem Gamifikasi Pembelajaran & Penilaian Berbasis Petualangan Alam.
     </footer>
 
-    <!-- SCRIPT -->
+    <!-- JAVASCRIPT CODE -->
     <script>
+        const ADMIN_PASS = "240785";
+
         const DEFAULT_POS_DATA = Array.from({ length: 15 }, (_, i) => {
             const posNum = i + 1;
             let zone = 1;
@@ -328,14 +407,13 @@
             return names[num - 1] || `Pos ${num}`;
         }
 
-        let studentsData = [
+        let studentsData = JSON.parse(localStorage.getItem('edu_students_data')) || [
             { id: "std_1", name: "Ahmad Pendaki", unlockedPos: 1, scores: {} },
-            { id: "std_2", name: "Siti Petualang", unlockedPos: 3, scores: { 1: 100, 2: 90 } },
-            { id: "std_3", name: "Budi Pramuka", unlockedPos: 5, scores: { 1: 85, 2: 80, 3: 100, 4: 90 } }
+            { id: "std_2", name: "Siti Petualang", unlockedPos: 3, scores: { 1: 100, 2: 90 } }
         ];
 
         let currentRole = 'siswa';
-        let currentStudent = studentsData[0];
+        let currentStudent = null;
         let posData = JSON.parse(localStorage.getItem('edu_pos_data')) || DEFAULT_POS_DATA;
         let selectedPosId = null;
         let db = null;
@@ -344,9 +422,50 @@
             initFirebaseFromStorage();
             renderMap();
             populateAdminPosSelect();
-            updateStudentProgressUI();
+            populateExistingStudentsDropdown();
+            
+            // Periksa akun login tersimpan
+            const savedStudentId = localStorage.getItem('edu_active_student_id');
+            if (savedStudentId) {
+                const found = studentsData.find(s => s.id === savedStudentId);
+                if (found) {
+                    currentStudent = found;
+                    closeStudentModal();
+                    updateStudentProgressUI();
+                    renderMap();
+                } else {
+                    openStudentModal();
+                }
+            } else {
+                openStudentModal();
+            }
             renderStudentListAdmin();
         };
+
+        // --- ROLE SWITCH WITH PASSWORD ---
+        function switchRoleRequest(targetRole) {
+            if (targetRole === 'admin' && currentRole !== 'admin') {
+                document.getElementById('modalAdminAuth').classList.remove('hidden');
+                document.getElementById('inputAdminPassword').value = '';
+                document.getElementById('inputAdminPassword').focus();
+            } else if (targetRole === 'siswa') {
+                setRole('siswa');
+            }
+        }
+
+        function verifyAdminPassword() {
+            const inputPass = document.getElementById('inputAdminPassword').value;
+            if (inputPass === ADMIN_PASS) {
+                closeAdminAuthModal();
+                setRole('admin');
+            } else {
+                alert("❌ Kata Sandi Admin Salah!");
+            }
+        }
+
+        function closeAdminAuthModal() {
+            document.getElementById('modalAdminAuth').classList.add('hidden');
+        }
 
         function setRole(role) {
             currentRole = role;
@@ -371,6 +490,75 @@
             }
         }
 
+        // --- MODAL IDENTITAS SISWA ---
+        function openStudentModal() {
+            populateExistingStudentsDropdown();
+            document.getElementById('modalStudentEntry').classList.remove('hidden');
+        }
+
+        function closeStudentModal() {
+            document.getElementById('modalStudentEntry').classList.add('hidden');
+        }
+
+        function switchModalTab(tab) {
+            document.getElementById('btnModalTabNew').className = tab === 'new' ? "flex-1 py-2 text-amber-400 border-b-2 border-amber-400" : "flex-1 py-2 text-slate-400 hover:text-white";
+            document.getElementById('btnModalTabSelect').className = tab === 'select' ? "flex-1 py-2 text-amber-400 border-b-2 border-amber-400" : "flex-1 py-2 text-slate-400 hover:text-white";
+            
+            document.getElementById('modalTabContentNew').classList.toggle('hidden', tab !== 'new');
+            document.getElementById('modalTabContentSelect').classList.toggle('hidden', tab !== 'select');
+        }
+
+        function registerNewStudent() {
+            const name = document.getElementById('inputNewStudentName').value.trim();
+            const cls = document.getElementById('inputNewStudentClass').value.trim();
+
+            if (!name) {
+                alert("⚠️ Masukkan nama Anda terlebih dahulu!");
+                return;
+            }
+
+            const fullName = cls ? `${name} (${cls})` : name;
+            const newStudent = {
+                id: 'std_' + Date.now(),
+                name: fullName,
+                unlockedPos: 1,
+                scores: {}
+            };
+
+            studentsData.push(newStudent);
+            currentStudent = newStudent;
+
+            saveStudentsData();
+            localStorage.setItem('edu_active_student_id', newStudent.id);
+
+            closeStudentModal();
+            updateStudentProgressUI();
+            renderMap();
+            renderStudentListAdmin();
+        }
+
+        function loginExistingStudent() {
+            const stdId = document.getElementById('selectExistingStudent').value;
+            const found = studentsData.find(s => s.id === stdId);
+
+            if (found) {
+                currentStudent = found;
+                localStorage.setItem('edu_active_student_id', found.id);
+                closeStudentModal();
+                updateStudentProgressUI();
+                renderMap();
+            }
+        }
+
+        function populateExistingStudentsDropdown() {
+            const select = document.getElementById('selectExistingStudent');
+            select.innerHTML = '';
+            studentsData.forEach(s => {
+                select.innerHTML += `<option value="${s.id}">${s.name} (Pos ${s.unlockedPos})</option>`;
+            });
+        }
+
+        // --- MAP RENDER ---
         function renderMap() {
             const z1Container = document.getElementById('zone1Posts');
             const z2Container = document.getElementById('zone2Posts');
@@ -380,9 +568,11 @@
             z2Container.innerHTML = '';
             z3Container.innerHTML = '';
 
+            const activeUnlockedPos = currentStudent ? currentStudent.unlockedPos : 1;
+
             posData.forEach(pos => {
-                const isUnlocked = pos.id <= currentStudent.unlockedPos;
-                const isCompleted = pos.id < currentStudent.unlockedPos;
+                const isUnlocked = pos.id <= activeUnlockedPos;
+                const isCompleted = pos.id < activeUnlockedPos;
                 const isActive = pos.id === selectedPosId;
 
                 let btnClass = "wood-panel text-left p-2.5 rounded-xl transition-all duration-200 flex flex-col justify-between border cursor-pointer hover:scale-105 ";
@@ -417,7 +607,7 @@
         }
 
         function selectPos(posId) {
-            if (posId > currentStudent.unlockedPos) return;
+            if (!currentStudent || posId > currentStudent.unlockedPos) return;
 
             selectedPosId = posId;
             renderMap();
@@ -611,7 +801,7 @@
                 std.unlockedPos++;
                 saveStudentsData();
                 renderStudentListAdmin();
-                if (std.id === currentStudent.id) {
+                if (currentStudent && std.id === currentStudent.id) {
                     updateStudentProgressUI();
                     renderMap();
                 }
@@ -638,6 +828,7 @@
         }
 
         function updateStudentProgressUI() {
+            if (!currentStudent) return;
             document.getElementById('currentStudentName').innerText = currentStudent.name;
             document.getElementById('studentProgressText').innerText = `Pos ${currentStudent.unlockedPos} / 15`;
         }
@@ -647,17 +838,15 @@
             if (db) db.collection('students').doc('list').set({ data: studentsData });
         }
 
-        // --- FIREBASE SETUP FLEKSIBEL (Bisa Parse Code JS Langsung) ---
+        // --- FIREBASE CONFIG PARSER ---
         function saveFirebaseConfig() {
             let rawInput = document.getElementById('firebaseConfigInput').value.trim();
             try {
-                // Jika user paste lengkap ada "const firebaseConfig = { ... };"
                 if (rawInput.includes('firebaseConfig')) {
                     rawInput = rawInput.replace(/const\s+firebaseConfig\s*=\s*/, '');
                     rawInput = rawInput.replace(/;\s*$/, '');
                 }
                 
-                // Ubah format objek JS biasa menjadi JSON valid dengan memberikan tanda kutip pada key
                 let jsonStr = rawInput
                     .replace(/([{,]\s*)([a-zA-Z0-9_]+)(\s*:\s*)/g, '$1"$2"$3')
                     .replace(/,\s*}/g, '}');
@@ -667,7 +856,7 @@
                 alert("🎉 Konfigurasi Firebase Berhasil Disimpan! Halaman akan dimuat ulang.");
                 location.reload();
             } catch (e) {
-                alert("❌ Format masih belum terbaca. Coba copy-paste ulang persis dari panel Firebase Anda.");
+                alert("❌ Format masih belum terbaca. Coba copy-paste ulang dari panel Firebase.");
             }
         }
 
