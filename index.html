@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Edu-Expedition 3D - Petualangan Penjelajah Dunia</title>
+    <title>Edu-Expedition 3D - Petualangan Penjelajah Dunia Realistis</title>
     <!-- Tailwind CSS CDN -->
     <script src="https://cdn.tailwindcss.com"></script>
     <!-- FontAwesome Icons -->
@@ -20,24 +20,23 @@
     <style>
         body {
             font-family: 'Montserrat', sans-serif;
-            background-color: #0f172a;
+            background-color: #090d16;
             color: #f8fafc;
             overflow-x: hidden;
         }
         .font-game {
             font-family: 'Luckiest Guy', cursive;
-            letter-spacing: 1px;
+            letter-spacing: 1.2px;
         }
         .wood-panel {
-            background: #5c3d2e;
-            background-image: linear-gradient(to bottom, #795238, #4a2e1b);
+            background: linear-gradient(135deg, #795238 0%, #4a2e1b 100%);
             border: 3px solid #8b5a2b;
-            box-shadow: inset 0 0 10px rgba(0,0,0,0.5), 0 4px 10px rgba(0,0,0,0.5);
+            box-shadow: inset 0 0 12px rgba(0,0,0,0.6), 0 6px 16px rgba(0,0,0,0.5);
         }
         #canvas3d-container {
             width: 100%;
-            height: 480px;
-            border-radius: 1rem;
+            height: 540px;
+            border-radius: 1.25rem;
             overflow: hidden;
             position: relative;
         }
@@ -45,6 +44,21 @@
             width: 100%;
             height: 100%;
             display: block;
+        }
+        /* Custom scrollbar */
+        ::-webkit-scrollbar {
+            width: 6px;
+            height: 6px;
+        }
+        ::-webkit-scrollbar-track {
+            background: #0f172a;
+        }
+        ::-webkit-scrollbar-thumb {
+            background: #334155;
+            border-radius: 3px;
+        }
+        ::-webkit-scrollbar-thumb:hover {
+            background: #f59e0b;
         }
     </style>
 </head>
@@ -55,20 +69,20 @@
         <div class="max-w-7xl mx-auto flex flex-wrap items-center justify-between gap-3">
             <div class="flex items-center gap-3">
                 <div class="w-10 h-10 rounded-full bg-gradient-to-tr from-amber-600 to-amber-400 flex items-center justify-center shadow-lg border border-amber-300 text-slate-900">
-                    <i class="fa-solid fa-earth-americas text-xl"></i>
+                    <i class="fa-solid fa-earth-americas text-xl animate-spin-slow"></i>
                 </div>
                 <div>
-                    <h1 class="font-game text-xl text-amber-400 tracking-wider">EDU-EXPEDITION 3D</h1>
-                    <p class="text-xs text-slate-400 flex items-center gap-1">
-                        <span id="firebaseStatusDot" class="w-2 h-2 rounded-full bg-amber-500 inline-block"></span>
+                    <h1 class="font-game text-xl sm:text-2xl text-amber-400 tracking-wider">EDU-EXPEDITION 3D</h1>
+                    <p class="text-[11px] text-slate-400 flex items-center gap-1.5">
+                        <span id="firebaseStatusDot" class="w-2 h-2 rounded-full bg-amber-500 inline-block animate-pulse"></span>
                         <span id="firebaseStatusText">Mode Local Storage</span>
                     </p>
                 </div>
             </div>
 
             <!-- ROLE SWITCH TOGGLE -->
-            <div class="flex items-center bg-slate-800 p-1.5 rounded-xl border border-slate-700 shadow-inner">
-                <span class="text-xs font-bold px-2 text-slate-400 uppercase hidden sm:inline">Pilih Peran:</span>
+            <div class="flex items-center bg-slate-950 p-1.5 rounded-xl border border-slate-800 shadow-inner">
+                <span class="text-xs font-bold px-2 text-slate-400 uppercase hidden sm:inline">Peran:</span>
                 <button id="btnRoleSiswa" onclick="switchRoleRequest('siswa')" class="px-4 py-1.5 rounded-lg text-xs font-extrabold transition-all duration-200 flex items-center gap-2 bg-amber-500 text-slate-950 shadow-md">
                     <i class="fa-solid fa-user-graduate"></i> SISWA
                 </button>
@@ -80,34 +94,34 @@
     </header>
 
     <!-- ADMIN BANNER INDICATOR -->
-    <div id="adminBanner" class="hidden bg-gradient-to-r from-red-900/90 via-amber-900/90 to-red-900/90 border-b border-red-500/50 px-4 py-2 text-center text-xs font-bold text-amber-200 shadow-inner">
+    <div id="adminBanner" class="hidden bg-gradient-to-r from-red-950 via-amber-950 to-red-950 border-b border-red-500/50 px-4 py-2 text-center text-xs font-bold text-amber-200 shadow-inner">
         <i class="fa-solid fa-shield-halved text-amber-400 animate-pulse mr-2"></i>
-        MODE ADMIN AKTIF: Kelola Pos, Kuis, Template Soal CSV, dan Progres Penjelajah Siswa.
+        MODE ADMIN AKTIF: Pengelolaan Pos, Soal CSV, Evaluasi Siswa & Sinkronisasi Database
     </div>
 
-    <!-- MAIN CONTAINER -->
+    <!-- MAIN CONTENT CONTAINER -->
     <main class="flex-grow max-w-7xl w-full mx-auto p-4 sm:p-6 grid grid-cols-1 lg:grid-cols-3 gap-6">
 
-        <!-- LEFT PANEL: TAMPILAN KARTUN 3D & POS MAP -->
+        <!-- LEFT PANEL: TAMPILAN 3D & SKENARIO MAP (2 COLS ON LG) -->
         <section class="lg:col-span-2 flex flex-col gap-4">
             
             <!-- Header Card Status -->
             <div class="wood-panel rounded-2xl p-4 flex flex-wrap items-center justify-between gap-4 text-amber-100">
                 <div>
                     <h2 class="font-game text-2xl text-amber-300 flex items-center gap-2">
-                        <i class="fa-solid fa-map-location-dot text-amber-400"></i> Dunianya Penjelajah 3D
+                        <i class="fa-solid fa-map-location-dot text-amber-400"></i> Karakter & Dunia Penjelajah Realistis
                     </h2>
-                    <p class="text-xs text-amber-200/80">Jelajahi Hutan, Gunung, Gurun, Laut, Kota, hingga Situs Bersejarah!</p>
+                    <p class="text-xs text-amber-200/90">Karakter Anak Penjelajah Lengkap Dengan Wajah, Mata, Mulut & Sendi Tubuh!</p>
                 </div>
                 <div class="flex items-center gap-3 text-xs">
-                    <div class="bg-black/40 px-3 py-1.5 rounded-lg border border-amber-500/20">
+                    <div class="bg-black/50 px-3 py-1.5 rounded-xl border border-amber-500/30">
                         <span class="text-slate-400 block text-[10px]">Penjelajah Aktif:</span>
                         <div class="flex items-center gap-2">
                             <span id="currentStudentName" class="font-bold text-amber-300">Belum Masuk</span>
-                            <button onclick="openStudentModal()" class="text-[10px] text-amber-400 hover:text-amber-200 underline">Ganti</button>
+                            <button onclick="openStudentModal()" class="text-[10px] text-amber-400 hover:text-amber-200 underline font-semibold">Ganti</button>
                         </div>
                     </div>
-                    <div class="bg-black/40 px-3 py-1.5 rounded-lg border border-amber-500/20">
+                    <div class="bg-black/50 px-3 py-1.5 rounded-xl border border-amber-500/30">
                         <span class="text-slate-400 block text-[10px]">Progres Lokasi:</span>
                         <span id="studentProgressText" class="font-bold text-emerald-400">Pos 1 / 15</span>
                     </div>
@@ -115,56 +129,59 @@
             </div>
 
             <!-- CANVAS 3D CONTAINER -->
-            <div id="canvas3d-container" class="border-2 border-slate-700/80 bg-slate-900 shadow-2xl">
+            <div id="canvas3d-container" class="border-2 border-slate-800 bg-slate-900 shadow-2xl">
                 <canvas id="canvas3d"></canvas>
 
                 <!-- Environment Badge Indicator -->
-                <div class="absolute top-4 left-4 bg-slate-950/80 backdrop-blur border border-amber-500/40 px-3 py-1.5 rounded-xl text-xs font-bold text-amber-300 flex items-center gap-2 shadow-lg">
-                    <i id="envIcon" class="fa-solid fa-tree text-emerald-400"></i>
-                    <span id="envName">Tema: Hutan Belantara</span>
+                <div class="absolute top-4 left-4 bg-slate-950/85 backdrop-blur border border-amber-500/40 px-3.5 py-2 rounded-xl text-xs font-bold text-amber-300 flex items-center gap-2.5 shadow-lg">
+                    <i id="envIcon" class="fa-solid fa-tree text-emerald-400 text-base"></i>
+                    <div>
+                        <span id="envName" class="block font-semibold">Tema: Hutan & Sungai Mengalir</span>
+                        <span id="characterStatus" class="text-[10px] text-slate-400 font-normal">Status: Siap Berjelajah</span>
+                    </div>
                 </div>
 
                 <!-- 3D Navigation Hint -->
-                <div class="absolute bottom-4 right-4 bg-slate-950/70 text-[10px] text-slate-400 px-2.5 py-1 rounded-lg pointer-events-none border border-slate-800">
-                    <i class="fa-solid fa-hand-pointer mr-1"></i> Drag / Putar Kamera 3D
+                <div class="absolute bottom-4 right-4 bg-slate-950/80 backdrop-blur text-[11px] text-slate-300 px-3 py-1.5 rounded-xl pointer-events-none border border-slate-800 shadow">
+                    <i class="fa-solid fa-hand-pointer text-amber-400 mr-1.5"></i> Putar / Zoom Kamera 3D
                 </div>
             </div>
 
             <!-- POS SELECTOR BUTTONS (15 POS) -->
-            <div class="bg-slate-900 border border-slate-800 p-4 rounded-2xl space-y-3">
+            <div class="bg-slate-900/90 border border-slate-800 p-4 rounded-2xl space-y-3 shadow-lg">
                 <div class="flex items-center justify-between text-xs border-b border-slate-800 pb-2">
-                    <span class="font-bold text-slate-300">Pilih Pos Tujuan Penjelajahan:</span>
-                    <span class="text-slate-500 text-[10px]">Klik tombol Pos untuk menggerakkan Karakter 3D</span>
+                    <span class="font-bold text-slate-300 flex items-center gap-2">
+                        <i class="fa-solid fa-route text-amber-400"></i> Pilih Pos Tujuan Penjelajahan (15 Pos):
+                    </span>
+                    <span class="text-slate-500 text-[10px]">Klik tombol Pos untuk menggerakkan Anak Penjelajah</span>
                 </div>
-                <div id="posButtonsGrid" class="grid grid-cols-3 sm:grid-cols-5 gap-2">
-                    <!-- Buttons generated dynamically -->
-                </div>
+                <div id="posButtonsGrid" class="grid grid-cols-3 sm:grid-cols-5 gap-2"></div>
             </div>
 
         </section>
 
-        <!-- RIGHT PANEL: SISWA INTERACTION OR ADMIN -->
+        <!-- RIGHT PANEL: SISWA / ADMIN INTERACTION -->
         <section class="lg:col-span-1 flex flex-col gap-4">
             
             <!-- PANEL SISWA -->
-            <div id="siswaPanel" class="bg-slate-900 border border-slate-800 rounded-2xl p-5 shadow-2xl flex flex-col h-full">
+            <div id="siswaPanel" class="bg-slate-900 border border-slate-800 rounded-2xl p-5 shadow-2xl flex flex-col h-full min-h-[500px]">
                 <div id="posDefaultState" class="my-auto text-center py-12 px-4">
-                    <div class="w-16 h-16 mx-auto rounded-full bg-slate-800 border border-slate-700 flex items-center justify-center text-amber-400 text-2xl mb-3">
-                        <i class="fa-solid fa-compass-drafting animate-spin"></i>
+                    <div class="w-16 h-16 mx-auto rounded-full bg-slate-800/80 border border-slate-700 flex items-center justify-center text-amber-400 text-3xl mb-4 shadow-inner">
+                        <i class="fa-solid fa-compass-drafting animate-spin-slow"></i>
                     </div>
-                    <h3 class="font-game text-xl text-slate-200">Pilih Pos di Peta</h3>
-                    <p class="text-xs text-slate-400 mt-2">Klik tombol Pos di bawah tampilan 3D untuk melihat tantangan kuis di lokasi tersebut.</p>
+                    <h3 class="font-game text-xl text-slate-200">Pilih Pos di Peta 3D</h3>
+                    <p class="text-xs text-slate-400 mt-2 leading-relaxed">Klik salah satu Pos di bawah tampilan 3D untuk mengarahkan karakter anak penjelajah, mempelajari materi, dan menyelesaikan tantangan kuis!</p>
                 </div>
 
                 <!-- Active Pos Content -->
                 <div id="posActiveContent" class="hidden flex-col h-full">
                     <div class="border-b border-slate-800 pb-3 mb-4 flex items-center justify-between">
                         <div>
-                            <span id="posDetailZone" class="text-[10px] uppercase font-bold text-amber-400 tracking-wider block">ZONA HUTAN</span>
+                            <span id="posDetailZone" class="text-[10px] uppercase font-extrabold text-amber-400 tracking-wider block">ZONA HUTAN</span>
                             <h3 id="posDetailTitle" class="font-game text-xl text-white">Pos 1: Basecamp</h3>
                         </div>
                         <div class="text-right">
-                            <span id="posDetailKKM" class="text-[10px] font-extrabold bg-amber-500/10 text-amber-400 px-2 py-0.5 rounded border border-amber-500/20 block">KKM: 80</span>
+                            <span id="posDetailKKM" class="text-[10px] font-extrabold bg-amber-500/10 text-amber-400 px-2.5 py-1 rounded-lg border border-amber-500/30 block">KKM: 80</span>
                         </div>
                     </div>
 
@@ -177,18 +194,18 @@
                         </button>
                     </div>
 
-                    <div id="tabMateriContent" class="flex-grow space-y-3 overflow-y-auto max-h-[400px] pr-1">
-                        <div class="bg-slate-950 p-3.5 rounded-xl border border-slate-800 text-xs text-slate-300 leading-relaxed" id="posMateriText"></div>
+                    <div id="tabMateriContent" class="flex-grow space-y-4 overflow-y-auto max-h-[380px] pr-1">
+                        <div class="bg-slate-950 p-4 rounded-xl border border-slate-800 text-xs text-slate-300 leading-relaxed" id="posMateriText"></div>
                         <button onclick="switchSiswaTab('kuis')" class="w-full py-3 rounded-xl bg-gradient-to-r from-amber-500 to-amber-600 hover:from-amber-400 hover:to-amber-500 text-slate-950 font-extrabold text-xs shadow-lg transition-all flex items-center justify-center gap-2">
                             MULAI TANTANGAN KUIS <i class="fa-solid fa-arrow-right"></i>
                         </button>
                     </div>
 
                     <div id="tabKuisContent" class="hidden flex-grow flex-col justify-between">
-                        <div id="quizContainer" class="space-y-4 overflow-y-auto max-h-[420px] pr-1"></div>
+                        <div id="quizContainer" class="space-y-4 overflow-y-auto max-h-[360px] pr-1"></div>
                         <div class="mt-4 pt-3 border-t border-slate-800">
                             <button id="btnSubmitQuiz" onclick="submitQuiz()" class="w-full py-3 rounded-xl bg-emerald-500 hover:bg-emerald-400 text-slate-950 font-extrabold text-xs shadow-lg transition-all flex items-center justify-center gap-2">
-                                <i class="fa-solid fa-paper-plane"></i> KIRIM JAWABAN & JELAJAHI POS SELANJUTNYA
+                                <i class="fa-solid fa-paper-plane"></i> KIRIM JAWABAN & BUKA POS BERIKUTNYA
                             </button>
                         </div>
                     </div>
@@ -199,9 +216,9 @@
             <div id="adminPanel" class="hidden bg-slate-900 border border-slate-800 rounded-2xl p-5 shadow-2xl flex-col h-full">
                 <div class="border-b border-slate-800 pb-3 mb-4">
                     <h3 class="font-game text-xl text-red-400 flex items-center gap-2">
-                        <i class="fa-solid fa-sliders"></i> Panel Kelola Admin
+                        <i class="fa-solid fa-sliders"></i> Panel Pengelola Admin
                     </h3>
-                    <p class="text-xs text-slate-400">Atur kuis, KKM, upload template CSV, dan koneksi Firebase.</p>
+                    <p class="text-xs text-slate-400">Kelola soal pos, impor/ekspor CSV, dan monitor progres siswa.</p>
                 </div>
 
                 <div class="flex gap-1 bg-slate-950 p-1 rounded-xl border border-slate-800 mb-4 text-[11px] font-bold">
@@ -209,7 +226,7 @@
                         <i class="fa-solid fa-users"></i> Siswa
                     </button>
                     <button onclick="switchAdminTab('editor')" id="adminTab2" class="flex-1 py-1.5 rounded-lg text-slate-400 hover:text-white">
-                        <i class="fa-solid fa-pen-to-square"></i> Pos & Kuis
+                        <i class="fa-solid fa-pen-to-square"></i> Pos & Soal
                     </button>
                     <button onclick="switchAdminTab('firebase')" id="adminTab3" class="flex-1 py-1.5 rounded-lg text-slate-400 hover:text-white">
                         <i class="fa-solid fa-database"></i> Firebase
@@ -219,9 +236,9 @@
                 <!-- Admin Tab 1: Monitoring -->
                 <div id="adminTabContentMonitoring" class="space-y-4">
                     <div class="flex justify-between items-center text-xs">
-                        <span class="font-bold text-slate-300">Daftar Progres Siswa:</span>
-                        <button onclick="exportToCSV()" class="text-[10px] bg-slate-800 hover:bg-slate-700 px-2.5 py-1 rounded border border-slate-700 text-amber-300">
-                            <i class="fa-solid fa-file-excel mr-1"></i> Ekspor CSV
+                        <span class="font-bold text-slate-300">Rekap Progres Penjelajahan:</span>
+                        <button onclick="exportToCSV()" class="text-[10px] bg-slate-800 hover:bg-slate-700 px-2.5 py-1 rounded-lg border border-slate-700 text-amber-300 font-bold transition">
+                            <i class="fa-solid fa-file-excel mr-1"></i> Ekspor Laporan CSV
                         </button>
                     </div>
                     <div id="studentListContainer" class="space-y-2 max-h-[380px] overflow-y-auto pr-1"></div>
@@ -232,10 +249,10 @@
                     <div class="bg-amber-950/40 border border-amber-500/30 p-3 rounded-xl space-y-2">
                         <span class="font-bold text-amber-300 block"><i class="fa-solid fa-file-csv mr-1"></i> Impor Soal via File CSV:</span>
                         <div class="flex gap-2">
-                            <button onclick="downloadQuestionTemplate()" class="flex-1 py-1.5 bg-slate-800 hover:bg-slate-700 text-amber-300 rounded border border-slate-700 text-[10px] font-bold">
-                                <i class="fa-solid fa-download mr-1"></i> Download Template
+                            <button onclick="downloadQuestionTemplate()" class="flex-1 py-2 bg-slate-800 hover:bg-slate-700 text-amber-300 rounded-lg border border-slate-700 text-[10px] font-bold">
+                                <i class="fa-solid fa-download mr-1"></i> Unduh Template CSV
                             </button>
-                            <label class="flex-1 py-1.5 bg-amber-600 hover:bg-amber-500 text-slate-950 rounded text-[10px] font-extrabold text-center cursor-pointer">
+                            <label class="flex-1 py-2 bg-amber-600 hover:bg-amber-500 text-slate-950 rounded-lg text-[10px] font-extrabold text-center cursor-pointer shadow">
                                 <i class="fa-solid fa-upload mr-1"></i> Upload File CSV
                                 <input type="file" id="csvFileInput" accept=".csv" class="hidden" onchange="uploadQuestionsFromCSV(event)">
                             </label>
@@ -243,7 +260,7 @@
                     </div>
 
                     <div>
-                        <label class="block font-bold text-slate-300 mb-1">Pilih Pos yang Ingin Diedit:</label>
+                        <label class="block font-bold text-slate-300 mb-1">Pilih Pos yang Diedit:</label>
                         <select id="adminSelectPos" onchange="loadPosEditorData()" class="w-full bg-slate-950 border border-slate-800 rounded-lg p-2 text-amber-300 font-bold focus:outline-none focus:border-amber-500"></select>
                     </div>
                     <div class="grid grid-cols-2 gap-2">
@@ -275,47 +292,47 @@
                 <!-- Admin Tab 3: Firebase Config -->
                 <div id="adminTabContentFirebase" class="hidden space-y-3 text-xs">
                     <p class="text-slate-400 leading-relaxed">
-                        Tempelkan konfigurasi Firebase Anda di sini dari Firebase Console.
+                        Masukkan objek konfigurasi Firebase Anda dari Firebase Console untuk sinkronisasi database cloud realtime.
                     </p>
                     <div>
-                        <label class="block font-bold text-slate-300 mb-1">Config Firebase:</label>
-                        <textarea id="firebaseConfigInput" rows="7" placeholder="Paste kode dari Firebase di sini..." class="w-full bg-slate-950 border border-slate-800 rounded p-2 font-mono text-[10px] text-amber-300 focus:outline-none focus:border-amber-500"></textarea>
+                        <label class="block font-bold text-slate-300 mb-1">Konfigurasi Firebase:</label>
+                        <textarea id="firebaseConfigInput" rows="7" placeholder="Paste firebaseConfig di sini..." class="w-full bg-slate-950 border border-slate-800 rounded p-2 font-mono text-[10px] text-amber-300 focus:outline-none focus:border-amber-500"></textarea>
                     </div>
                     <button onclick="saveFirebaseConfig()" class="w-full py-2.5 bg-sky-600 hover:bg-sky-500 text-white font-extrabold rounded-lg shadow">
-                        <i class="fa-solid fa-plug mr-1"></i> SIMPAN & KONEKSIKAN FIREBASE
+                        <i class="fa-solid fa-plug mr-1"></i> HUBUNGKAN DATABASE FIREBASE
                     </button>
                 </div>
             </div>
         </section>
     </main>
 
-    <!-- MODAL POPUP: MASUK SISWA -->
-    <div id="modalStudentEntry" class="fixed inset-0 z-50 bg-slate-950/80 backdrop-blur-md flex items-center justify-center p-4">
+    <!-- MODAL POPUP: REGISTRASI SISWA -->
+    <div id="modalStudentEntry" class="fixed inset-0 z-50 bg-slate-950/85 backdrop-blur-md flex items-center justify-center p-4">
         <div class="bg-slate-900 border-2 border-amber-500/50 rounded-2xl max-w-md w-full p-6 shadow-2xl relative overflow-hidden">
             <div class="text-center mb-6">
                 <div class="w-16 h-16 bg-gradient-to-tr from-amber-600 to-amber-400 rounded-full flex items-center justify-center mx-auto mb-3 text-slate-950 text-2xl shadow-lg">
-                    <i class="fa-solid fa-person-walking-luggage"></i>
+                    <i class="fa-solid fa-person-hiking"></i>
                 </div>
                 <h3 class="font-game text-2xl text-amber-400">PETUALANGAN DUNIA 3D</h3>
-                <p class="text-xs text-slate-400 mt-1">Masukkan nama Anda untuk mulai menjelajahi lokasi bersejarah & alam</p>
+                <p class="text-xs text-slate-400 mt-1">Sistem Gamifikasi Pembelajaran Interaktif Penjelajah Muda</p>
             </div>
 
             <div class="flex border-b border-slate-800 mb-4 text-xs font-bold">
                 <button id="btnModalTabNew" onclick="switchModalTab('new')" class="flex-1 py-2 text-amber-400 border-b-2 border-amber-400">Siswa Baru</button>
-                <button id="btnModalTabSelect" onclick="switchModalTab('select')" class="flex-1 py-2 text-slate-400 hover:text-white">Pilih Nama Terdaftar</button>
+                <button id="btnModalTabSelect" onclick="switchModalTab('select')" class="flex-1 py-2 text-slate-400 hover:text-white">Pilih Terdaftar</button>
             </div>
 
             <div id="modalTabContentNew" class="space-y-4">
                 <div>
-                    <label class="block text-xs text-slate-300 font-bold mb-1">Nama Lengkap Siswa:</label>
+                    <label class="block text-xs text-slate-300 font-bold mb-1">Nama Lengkap Siswa Penjelajah:</label>
                     <input id="inputNewStudentName" type="text" placeholder="Contoh: Budi Pratama" class="w-full bg-slate-950 border border-slate-700 rounded-xl p-3 text-xs text-white focus:outline-none focus:border-amber-500">
                 </div>
                 <div>
                     <label class="block text-xs text-slate-300 font-bold mb-1">Kelas / No. Absen (Opsional):</label>
                     <input id="inputNewStudentClass" type="text" placeholder="Contoh: Kelas 5A / 08" class="w-full bg-slate-950 border border-slate-700 rounded-xl p-3 text-xs text-white focus:outline-none focus:border-amber-500">
                 </div>
-                <button onclick="registerNewStudent()" class="w-full py-3 bg-gradient-to-r from-amber-500 to-amber-600 hover:from-amber-400 hover:to-amber-500 text-slate-950 font-extrabold text-xs rounded-xl shadow-lg">
-                    MULAI PENJELAJAHAN 3D 🚀
+                <button onclick="registerNewStudent()" class="w-full py-3 bg-gradient-to-r from-amber-500 to-amber-600 hover:from-amber-400 hover:to-amber-500 text-slate-950 font-extrabold text-xs rounded-xl shadow-lg transition">
+                    MULAI PETUALANGAN 3D 🚀
                 </button>
             </div>
 
@@ -324,23 +341,23 @@
                     <label class="block text-xs text-slate-300 font-bold mb-1">Pilih Nama Anda:</label>
                     <select id="selectExistingStudent" class="w-full bg-slate-950 border border-slate-700 rounded-xl p-3 text-xs text-amber-300 font-bold focus:outline-none focus:border-amber-500"></select>
                 </div>
-                <button onclick="loginExistingStudent()" class="w-full py-3 bg-emerald-500 hover:bg-emerald-400 text-slate-950 font-extrabold text-xs rounded-xl shadow-lg">
-                    LANJUTKAN PENJELAJAHAN 🧭
+                <button onclick="loginExistingStudent()" class="w-full py-3 bg-emerald-500 hover:bg-emerald-400 text-slate-950 font-extrabold text-xs rounded-xl shadow-lg transition">
+                    LANJUTKAN PETUALANGAN 🧭
                 </button>
             </div>
         </div>
     </div>
 
-    <!-- MODAL POPUP: PASSWORD ADMIN -->
-    <div id="modalAdminAuth" class="hidden fixed inset-0 z-50 bg-slate-950/80 backdrop-blur-md flex items-center justify-center p-4">
+    <!-- MODAL POPUP: AUTH ADMIN PASSWORD -->
+    <div id="modalAdminAuth" class="hidden fixed inset-0 z-50 bg-slate-950/85 backdrop-blur-md flex items-center justify-center p-4">
         <div class="bg-slate-900 border-2 border-red-500/50 rounded-2xl max-w-xs w-full p-5 shadow-2xl text-center">
             <div class="w-12 h-12 bg-red-900/50 border border-red-500 rounded-full flex items-center justify-center mx-auto mb-3 text-red-400 text-xl">
                 <i class="fa-solid fa-lock"></i>
             </div>
-            <h4 class="font-game text-lg text-red-400">AKSES ADMIN</h4>
+            <h4 class="font-game text-lg text-red-400">AKSES KHUSUS ADMIN</h4>
             <p class="text-[11px] text-slate-400 mt-1 mb-4">Masukkan Kata Sandi Khusus Admin</p>
             
-            <input id="inputAdminPassword" type="password" placeholder="Masukkan Password..." class="w-full bg-slate-950 border border-slate-700 rounded-lg p-2.5 text-center text-xs text-white focus:outline-none focus:border-red-500 mb-3">
+            <input id="inputAdminPassword" type="password" placeholder="Password Admin..." class="w-full bg-slate-950 border border-slate-700 rounded-lg p-2.5 text-center text-xs text-white focus:outline-none focus:border-red-500 mb-3">
             
             <div class="flex gap-2">
                 <button onclick="closeAdminAuthModal()" class="flex-1 py-2 bg-slate-800 hover:bg-slate-700 text-slate-300 text-xs font-bold rounded-lg">Batal</button>
@@ -350,23 +367,23 @@
     </div>
 
     <!-- FOOTER -->
-    <footer class="mt-auto border-t border-slate-800 bg-slate-950/80 px-4 py-3 text-center text-xs text-slate-500">
-        Edu-Expedition 3D Penjelajahan Dunia &copy; 2026 — Sistem Gamifikasi Pembelajaran Interaktif.
+    <footer class="mt-auto border-t border-slate-800 bg-slate-950/90 px-4 py-3 text-center text-xs text-slate-500">
+        Edu-Expedition 3D Realistis &copy; 2026 — Pembelajaran Interaktif Berbasis Karakter & Visual Tiga Dimensi.
     </footer>
 
-    <!-- JAVASCRIPT & THREE.JS LOGIC -->
+    <!-- JAVASCRIPT & THREE.JS LOGIC ENGINE -->
     <script>
         const ADMIN_PASS = "240785";
 
         const DEFAULT_POS_DATA = Array.from({ length: 15 }, (_, i) => {
             const posNum = i + 1;
             let envType = "hutan";
-            let envName = "Hutan Belantara";
+            let envName = "Hutan & Sungai Mengalir";
             
-            if (posNum >= 4 && posNum <= 6) { envType = "gunung"; envName = "Pegunungan Terjal"; }
+            if (posNum >= 4 && posNum <= 6) { envType = "gunung"; envName = "Pegunungan Terjal & Awan"; }
             else if (posNum >= 7 && posNum <= 9) { envType = "gurun"; envName = "Gurun Pasir & Piramida"; }
-            else if (posNum >= 10 && posNum <= 12) { envType = "laut"; envName = "Laut & Samudra"; }
-            else if (posNum >= 13 && posNum <= 14) { envType = "kota"; envName = "Perkotaan Modern"; }
+            else if (posNum >= 10 && posNum <= 12) { envType = "laut"; envName = "Pesisir Laut & Mercusuar"; }
+            else if (posNum >= 13 && posNum <= 14) { envType = "kota"; envName = "Perkantoran Perkotaan Modern"; }
             else if (posNum === 15) { envType = "sejarah"; envName = "Candi Puncak Bersejarah"; }
 
             return {
@@ -375,18 +392,18 @@
                 envType: envType,
                 envName: envName,
                 kkm: 80,
-                materi: `Selamat datang di Pos ${posNum} (${envName}). Pelajari materi unik tentang ekosistem dan sejarah area ini sebelum menjawab tantangan kuis!`,
+                materi: `Selamat datang di Pos ${posNum} (${envName}). Pelajari materi eksosistem dan karakteristik wilayah ini sebelum menjawab kuis tantangan!`,
                 questions: [
                     {
                         id: 1,
-                        text: `Pertanyaan Kunci Pos ${posNum}: Apa persiapan utama saat melakukan penjelajahan di lingkungan ${envName}?`,
-                        options: ["Mempelajari Peta & Membawa Perlengkapan Tepat", "Berlari Tanpa Membawa Perbekalan", "Meninggalkan Kelompok Penjelajah", "Tidur Di Tengah Jalan"],
+                        text: `Pertanyaan Pos ${posNum}: Perlengkapan apa yang penting dibawa saat ekspedisi di ${envName}?`,
+                        options: ["Peta, Pakaian Sesuai & Kompas", "Sandal Teplek & Tanpa Air", "Mainan Konsol Game", "Meninggalkan Kelompok"],
                         correctAnswer: 0
                     },
                     {
                         id: 2,
-                        text: `Bagaimana cara melestarikan kawasan ${envName} yang kita lewati?`,
-                        options: ["Merusak Lingkungan Sekitar", "Menjaga Kebersihan & Tidak Membuang Sampah", "Mengambil Benda Bersejarah Sembarangan", "Membuat Kegaduhan"],
+                        text: `Bagaimana cara menjaga kelestarian di area ${envName}?`,
+                        options: ["Mencoret-coret Fasilitas", "Menjaga Kebersihan & Membuang Sampah", "Menebang Pohon Sembarangan", "Membuat Kegaduhan"],
                         correctAnswer: 1
                     }
                 ]
@@ -395,17 +412,17 @@
 
         function getPosName(num) {
             const names = [
-                "Gerbang Hutan", "Lembah Pepohonan", "Mata Air Hutan",
-                "Kaki Gunung", "Tebing Berbatu", "Puncak Kabut",
-                "Oasis Pasir", "Lembah Piramida", "Gurun Karavan",
-                "Pesisir Pantai", "Dermaga Mercusuar", "Pulau Karang",
-                "Taman Kota", "Pusat Perkotaan", "CANDI PUNCAK BERSEJARAH"
+                "Gerbang Hutan & Sungai", "Lembah Pepohonan Rindang", "Jembatan Kayu Sungai",
+                "Kaki Gunung Berbatu", "Tebing Granit Terjal", "Puncak Kabut Awan",
+                "Oasis Pasir Warm", "Lembah Piramida Agung", "Kawasan Karavan Gurun",
+                "Pesisir Pantai Karang", "Dermaga Mercusuar", "Pulau Batu Laut",
+                "Taman Kota Perkotaan", "Gedung Perkantoran Modern", "CANDI PUNCAK BERSEJARAH"
             ];
             return names[num - 1] || `Pos ${num}`;
         }
 
         let studentsData = JSON.parse(localStorage.getItem('edu_students_data')) || [
-            { id: "std_1", name: "Ahmad Penjelajah", unlockedPos: 1, scores: {} },
+            { id: "std_1", name: "Budi Penjelajah", unlockedPos: 1, scores: {} },
             { id: "std_2", name: "Siti Petualang", unlockedPos: 3, scores: { 1: 100, 2: 90 } }
         ];
 
@@ -415,10 +432,15 @@
         let selectedPosId = null;
         let db = null;
 
-        // --- THREE.JS 3D VARIABLES ---
+        // THREE.JS SYSTEM VARIABLES
         let scene, camera, renderer, controls;
-        let playerMesh, terrainMesh, landmarkGroup;
+        let playerMesh, headMesh;
+        let leftEyeMesh, rightEyeMesh, mouthMesh, noseMesh, leftEarMesh, rightEarMesh;
+        let upperArmL, lowerArmL, upperArmR, lowerArmR, handL, handR;
+        let upperLegL, lowerLegL, upperLegR, lowerLegR, shoeL, shoeR;
+        let landmarkGroup, animatedElementsGroup;
         let targetPlayerPos = { x: 0, z: 0 };
+        let currentEnvType = "hutan";
 
         window.onload = function() {
             init3DScene();
@@ -433,86 +455,59 @@
                     currentStudent = found;
                     closeStudentModal();
                     updateStudentProgressUI();
-                } else {
-                    openStudentModal();
-                }
-            } else {
-                openStudentModal();
-            }
+                } else openStudentModal();
+            } else openStudentModal();
+
             renderPosButtons();
             renderStudentListAdmin();
         };
 
-        // --- THREE.JS 3D SCENE INITIALIZATION ---
         function init3DScene() {
             const container = document.getElementById('canvas3d-container');
             const canvas = document.getElementById('canvas3d');
 
             scene = new THREE.Scene();
-            scene.background = new THREE.Color(0x1e293b);
-            scene.fog = new THREE.FogExp2(0x1e293b, 0.03);
+            scene.background = new THREE.Color(0x0a0f1d);
+            scene.fog = new THREE.FogExp2(0x0a0f1d, 0.022);
 
             camera = new THREE.PerspectiveCamera(45, container.clientWidth / container.clientHeight, 0.1, 1000);
-            camera.position.set(0, 8, 14);
+            camera.position.set(0, 7, 14);
 
             renderer = new THREE.WebGLRenderer({ canvas: canvas, antialias: true });
             renderer.setSize(container.clientWidth, container.clientHeight);
             renderer.shadowMap.enabled = true;
+            renderer.shadowMap.type = THREE.PCFSoftShadowMap;
 
             controls = new THREE.OrbitControls(camera, renderer.domElement);
             controls.enableDamping = true;
-            controls.maxPolarAngle = Math.PI / 2.1;
+            controls.dampingFactor = 0.05;
+            controls.maxPolarAngle = Math.PI / 2.05;
 
             // Lights
-            const ambientLight = new THREE.AmbientLight(0xffffff, 0.6);
+            const ambientLight = new THREE.AmbientLight(0xffffff, 0.75);
             scene.add(ambientLight);
 
-            const dirLight = new THREE.DirectionalLight(0xfffaed, 0.8);
-            dirLight.position.set(10, 20, 10);
-            dirLight.castShadow = true;
-            scene.add(dirLight);
+            const sunLight = new THREE.DirectionalLight(0xfff5ea, 1.0);
+            sunLight.position.set(15, 25, 15);
+            sunLight.castShadow = true;
+            sunLight.shadow.mapSize.width = 1024;
+            sunLight.shadow.mapSize.height = 1024;
+            scene.add(sunLight);
 
-            // Ground Terrain
-            const terrainGeo = new THREE.PlaneGeometry(30, 30);
-            const terrainMat = new THREE.MeshStandardMaterial({ color: 0x22c55e, roughness: 0.8 });
-            terrainMesh = new THREE.Mesh(terrainGeo, terrainMat);
+            // Ground Base
+            const terrainGeo = new THREE.PlaneGeometry(36, 36);
+            const terrainMat = new THREE.MeshStandardMaterial({ color: 0x15803d, roughness: 0.8 });
+            const terrainMesh = new THREE.Mesh(terrainGeo, terrainMat);
             terrainMesh.rotation.x = -Math.PI / 2;
             terrainMesh.receiveShadow = true;
             scene.add(terrainMesh);
 
-            // Player Cartoon Character (Simple 3D Explorer)
-            const playerGroup = new THREE.Group();
-            
-            // Body
-            const bodyGeo = new THREE.CylinderGeometry(0.4, 0.3, 1, 8);
-            const bodyMat = new THREE.MeshStandardMaterial({ color: 0x38bdf8 });
-            const body = new THREE.Mesh(bodyGeo, bodyMat);
-            body.position.y = 0.5;
-            body.castShadow = true;
-            playerGroup.add(body);
+            // BUILD REALISTIC PROCEDURAL 3D CARTOON HUMAN CHILD CHARACTER
+            createDetailed3DHumanChild();
 
-            // Head & Hat
-            const headGeo = new THREE.SphereGeometry(0.35, 16, 16);
-            const headMat = new THREE.MeshStandardMaterial({ color: 0xfde047 });
-            const head = new THREE.Mesh(headGeo, headMat);
-            head.position.y = 1.2;
-            head.castShadow = true;
-            playerGroup.add(head);
-
-            // Backpack
-            const packGeo = new THREE.BoxGeometry(0.4, 0.5, 0.3);
-            const packMat = new THREE.MeshStandardMaterial({ color: 0x854d0e });
-            const pack = new THREE.Mesh(packGeo, packMat);
-            pack.position.set(0, 0.6, -0.25);
-            pack.castShadow = true;
-            playerGroup.add(pack);
-
-            playerMesh = playerGroup;
-            scene.add(playerMesh);
-
-            // Group for environment objects (Trees, Rocks, Pyramids, Buildings)
             landmarkGroup = new THREE.Group();
-            scene.add(landmarkGroup);
+            animatedElementsGroup = new THREE.Group();
+            scene.add(landmarkGroup, animatedElementsGroup);
 
             update3DEnvironment("hutan");
 
@@ -520,122 +515,359 @@
             animate3D();
         }
 
+        // --- FULL PROCEDURAL ARTICULATED 3D HUMAN CHILD MODEL ---
+        function createDetailed3DHumanChild() {
+            playerMesh = new THREE.Group();
+
+            const skinMat = new THREE.MeshStandardMaterial({ color: 0xfdd2a3, roughness: 0.5 });
+            const shirtMat = new THREE.MeshStandardMaterial({ color: 0x0284c7, roughness: 0.6 });
+            const vestMat = new THREE.MeshStandardMaterial({ color: 0x854d0e, roughness: 0.7 });
+            const pantsMat = new THREE.MeshStandardMaterial({ color: 0x334155, roughness: 0.7 });
+            const shoeMat = new THREE.MeshStandardMaterial({ color: 0x1e293b, roughness: 0.8 });
+            const eyeWhiteMat = new THREE.MeshBasicMaterial({ color: 0xffffff });
+            const eyeIrisMat = new THREE.MeshBasicMaterial({ color: 0x1e3a8a });
+            const eyePupilMat = new THREE.MeshBasicMaterial({ color: 0x000000 });
+            const hairMat = new THREE.MeshStandardMaterial({ color: 0x451a03, roughness: 0.8 });
+
+            // 1. HEAD & DETAILED FACIAL FEATURES
+            headMesh = new THREE.Group();
+            const headBase = new THREE.Mesh(new THREE.SphereGeometry(0.38, 20, 20), skinMat);
+            headBase.scale.set(1, 1.1, 1);
+            headBase.castShadow = true;
+            headMesh.add(headBase);
+
+            // Hair
+            const hairCap = new THREE.Mesh(new THREE.SphereGeometry(0.4, 16, 16, 0, Math.PI * 2, 0, Math.PI / 1.8), hairMat);
+            hairCap.position.set(0, 0.05, 0);
+            headMesh.add(hairCap);
+
+            // Eyes (Left & Right with White, Iris, Pupil)
+            const createEye = (xSign) => {
+                const eyeGroup = new THREE.Group();
+                const eyeWhite = new THREE.Mesh(new THREE.SphereGeometry(0.08, 12, 12), eyeWhiteMat);
+                eyeWhite.scale.set(1, 1.2, 0.5);
+                
+                const iris = new THREE.Mesh(new THREE.SphereGeometry(0.045, 12, 12), eyeIrisMat);
+                iris.position.z = 0.05;
+                const pupil = new THREE.Mesh(new THREE.SphereGeometry(0.025, 12, 12), eyePupilMat);
+                pupil.position.z = 0.07;
+                
+                eyeGroup.add(eyeWhite, iris, pupil);
+                eyeGroup.position.set(xSign * 0.14, 0.06, 0.32);
+                return eyeGroup;
+            };
+            leftEyeMesh = createEye(-1);
+            rightEyeMesh = createEye(1);
+            headMesh.add(leftEyeMesh, rightEyeMesh);
+
+            // Nose
+            noseMesh = new THREE.Mesh(new THREE.SphereGeometry(0.045, 12, 12), skinMat);
+            noseMesh.position.set(0, -0.02, 0.38);
+            headMesh.add(noseMesh);
+
+            // Mouth (Expressive Curve)
+            const mouthGeo = new THREE.TorusGeometry(0.07, 0.02, 8, 12, Math.PI);
+            mouthMesh = new THREE.Mesh(mouthGeo, new THREE.MeshBasicMaterial({ color: 0xb91c1c }));
+            mouthMesh.rotation.x = Math.PI;
+            mouthMesh.position.set(0, -0.15, 0.35);
+            headMesh.add(mouthMesh);
+
+            // Ears (Left & Right)
+            const earGeo = new THREE.SphereGeometry(0.07, 10, 10);
+            earGeo.scale(0.5, 1, 0.8);
+            leftEarMesh = new THREE.Mesh(earGeo, skinMat);
+            leftEarMesh.position.set(-0.38, 0.02, 0);
+            rightEarMesh = new THREE.Mesh(earGeo, skinMat);
+            rightEarMesh.position.set(0.38, 0.02, 0);
+            headMesh.add(leftEarMesh, rightEarMesh);
+
+            // Ranger Explorer Hat
+            const hatBrim = new THREE.Mesh(new THREE.CylinderGeometry(0.68, 0.68, 0.04, 20), vestMat);
+            hatBrim.position.y = 0.32;
+            const hatCrown = new THREE.Mesh(new THREE.CylinderGeometry(0.42, 0.44, 0.3, 20), vestMat);
+            hatCrown.position.y = 0.46;
+            const hatBand = new THREE.Mesh(new THREE.CylinderGeometry(0.445, 0.445, 0.06, 20), new THREE.MeshBasicMaterial({ color: 0x451a03 }));
+            hatBand.position.y = 0.35;
+            headMesh.add(hatBrim, hatCrown, hatBand);
+
+            headMesh.position.y = 1.45;
+            playerMesh.add(headMesh);
+
+            // 2. TORSO & EXPLORER VEST / BACKPACK
+            const torsoGroup = new THREE.Group();
+            const shirt = new THREE.Mesh(new THREE.CylinderGeometry(0.28, 0.24, 0.6, 12), shirtMat);
+            shirt.position.y = 0.95;
+            shirt.castShadow = true;
+
+            const vest = new THREE.Mesh(new THREE.CylinderGeometry(0.3, 0.26, 0.58, 12, 1, true, 0, Math.PI * 1.7), vestMat);
+            vest.rotation.y = Math.PI * 0.15;
+            vest.position.y = 0.95;
+
+            // Explorer Backpack
+            const pack = new THREE.Mesh(new THREE.BoxGeometry(0.38, 0.48, 0.22), new THREE.MeshStandardMaterial({ color: 0x78350f }));
+            pack.position.set(0, 0.98, -0.24);
+            pack.castShadow = true;
+
+            torsoGroup.add(shirt, vest, pack);
+            playerMesh.add(torsoGroup);
+
+            // 3. ARTICULATED ARMS & HANDS WITH FINGERS
+            const createArm = (xSign) => {
+                const armGroup = new THREE.Group();
+                armGroup.position.set(xSign * 0.34, 1.18, 0);
+
+                const upperArm = new THREE.Mesh(new THREE.CylinderGeometry(0.08, 0.07, 0.32), shirtMat);
+                upperArm.position.y = -0.16;
+
+                const lowerArmGroup = new THREE.Group();
+                lowerArmGroup.position.y = -0.32;
+                const lowerArm = new THREE.Mesh(new THREE.CylinderGeometry(0.07, 0.06, 0.3), skinMat);
+                lowerArm.position.y = -0.15;
+
+                // Hand Palm
+                const hand = new THREE.Mesh(new THREE.BoxGeometry(0.09, 0.1, 0.04), skinMat);
+                hand.position.y = -0.32;
+
+                // Fingers
+                for (let f = -0.03; f <= 0.03; f += 0.02) {
+                    const finger = new THREE.Mesh(new THREE.BoxGeometry(0.018, 0.05, 0.02), skinMat);
+                    finger.position.set(f, -0.06, 0);
+                    hand.add(finger);
+                }
+
+                lowerArmGroup.add(lowerArm, hand);
+                armGroup.add(upperArm, lowerArmGroup);
+
+                return { armGroup, lowerArmGroup, hand };
+            };
+
+            const leftArmObj = createArm(-1);
+            upperArmL = leftArmObj.armGroup;
+            lowerArmL = leftArmObj.lowerArmGroup;
+            handL = leftArmObj.hand;
+
+            const rightArmObj = createArm(1);
+            upperArmR = rightArmObj.armGroup;
+            lowerArmR = rightArmObj.lowerArmGroup;
+            handR = rightArmObj.hand;
+
+            // Add Magnifying Glass in Right Hand
+            const glassRing = new THREE.Mesh(new THREE.TorusGeometry(0.12, 0.02, 8, 16), new THREE.MeshStandardMaterial({ color: 0xfacc15, metalness: 0.8 }));
+            glassRing.position.set(0, -0.08, 0.12);
+            glassRing.rotation.x = Math.PI / 2;
+            const glassHandle = new THREE.Mesh(new THREE.CylinderGeometry(0.02, 0.02, 0.15), new THREE.MeshStandardMaterial({ color: 0x78350f }));
+            glassHandle.position.set(0, -0.16, 0.05);
+            glassHandle.rotation.x = Math.PI / 3;
+            handR.add(glassRing, glassHandle);
+
+            playerMesh.add(upperArmL, upperArmR);
+
+            // 4. ARTICULATED LEGS & FEET WITH REALISTIC SHOES
+            const createLeg = (xSign) => {
+                const legGroup = new THREE.Group();
+                legGroup.position.set(xSign * 0.16, 0.65, 0);
+
+                const upperLeg = new THREE.Mesh(new THREE.CylinderGeometry(0.11, 0.09, 0.35), pantsMat);
+                upperLeg.position.y = -0.175;
+
+                const lowerLegGroup = new THREE.Group();
+                lowerLegGroup.position.y = -0.35;
+                const lowerLeg = new THREE.Mesh(new THREE.CylinderGeometry(0.08, 0.07, 0.32), skinMat);
+                lowerLeg.position.y = -0.16;
+
+                // Shoe / Boot
+                const shoe = new THREE.Mesh(new THREE.BoxGeometry(0.14, 0.14, 0.28), shoeMat);
+                shoe.position.set(0, -0.32, 0.05);
+                shoe.castShadow = true;
+
+                lowerLegGroup.add(lowerLeg, shoe);
+                legGroup.add(upperLeg, lowerLegGroup);
+
+                return { legGroup, lowerLegGroup, shoe };
+            };
+
+            const leftLegObj = createLeg(-1);
+            upperLegL = leftLegObj.legGroup;
+            lowerLegL = leftLegObj.lowerLegGroup;
+            shoeL = leftLegObj.shoe;
+
+            const rightLegObj = createLeg(1);
+            upperLegR = rightLegObj.legGroup;
+            lowerLegR = rightLegObj.lowerLegGroup;
+            shoeR = rightLegObj.shoe;
+
+            playerMesh.add(upperLegL, upperLegR);
+            scene.add(playerMesh);
+        }
+
         function update3DEnvironment(type) {
-            // Clear previous landmarks
-            while(landmarkGroup.children.length > 0){ 
-                landmarkGroup.remove(landmarkGroup.children[0]); 
-            }
+            currentEnvType = type;
+            while(landmarkGroup.children.length > 0) landmarkGroup.remove(landmarkGroup.children[0]);
+            while(animatedElementsGroup.children.length > 0) animatedElementsGroup.remove(animatedElementsGroup.children[0]);
 
             const envBadge = document.getElementById('envName');
             const envIcon = document.getElementById('envIcon');
 
             if (type === "hutan") {
-                terrainMesh.material.color.setHex(0x15803d); // Green
-                scene.background.setHex(0x0f172a);
-                envBadge.innerText = "Tema: Hutan Belantara";
-                envIcon.className = "fa-solid fa-tree text-emerald-400";
-                createTrees();
+                envBadge.innerText = "Tema: Hutan & Sungai Mengalir Realistis";
+                envIcon.className = "fa-solid fa-tree text-emerald-400 text-base";
+                createRiverAndTreesEnvironment();
             } else if (type === "gunung") {
-                terrainMesh.material.color.setHex(0x475569); // Grey Stone
-                scene.background.setHex(0x1e1b4b);
-                envBadge.innerText = "Tema: Pegunungan Terjal";
-                envIcon.className = "fa-solid fa-mountain text-amber-400";
-                createRocks();
+                envBadge.innerText = "Tema: Pegunungan Terjal & Awan Kabut";
+                envIcon.className = "fa-solid fa-mountain text-amber-400 text-base";
+                createMountainEnvironment();
             } else if (type === "gurun") {
-                terrainMesh.material.color.setHex(0xd97706); // Desert Sand
-                scene.background.setHex(0x451a03);
-                envBadge.innerText = "Tema: Gurun Pasir & Piramida";
-                envIcon.className = "fa-solid fa-sun text-yellow-400";
-                createPyramids();
+                envBadge.innerText = "Tema: Gurun Pasir, Oasis & Piramida";
+                envIcon.className = "fa-solid fa-sun text-yellow-400 text-base";
+                createDesertEnvironment();
             } else if (type === "laut") {
-                terrainMesh.material.color.setHex(0x0284c7); // Sea Blue
-                scene.background.setHex(0x0c4a6e);
-                envBadge.innerText = "Tema: Laut & Samudra";
-                envIcon.className = "fa-solid fa-water text-sky-400";
-                createIslands();
+                envBadge.innerText = "Tema: Pesisir Pantai, Laut & Mercusuar";
+                envIcon.className = "fa-solid fa-water text-sky-400 text-base";
+                createOceanEnvironment();
             } else if (type === "kota") {
-                terrainMesh.material.color.setHex(0x334155); // Concrete
-                scene.background.setHex(0x020617);
-                envBadge.innerText = "Tema: Perkotaan Modern";
-                envIcon.className = "fa-solid fa-city text-indigo-400";
-                createBuildings();
+                envBadge.innerText = "Tema: Gedung Perkantoran Perkotaan Modern";
+                envIcon.className = "fa-solid fa-city text-indigo-400 text-base";
+                createCityEnvironment();
             } else if (type === "sejarah") {
-                terrainMesh.material.color.setHex(0x78350f); // Ancient Ground
-                scene.background.setHex(0x2e1065);
-                envBadge.innerText = "Tema: Candi Puncak Bersejarah";
-                envIcon.className = "fa-solid fa-gopuram text-amber-300";
-                createTemple();
+                envBadge.innerText = "Tema: Kompleks Candi Puncak Bersejarah";
+                envIcon.className = "fa-solid fa-gopuram text-amber-300 text-base";
+                createTempleEnvironment();
             }
         }
 
-        // Environment Builders
-        function createTrees() {
-            for (let i = 0; i < 12; i++) {
+        // --- REALISTIC ENVIRONMENT BUILDERS ---
+        function createRiverAndTreesEnvironment() {
+            // Flowing Water River
+            const river = new THREE.Mesh(new THREE.BoxGeometry(8, 0.1, 36), new THREE.MeshStandardMaterial({ color: 0x0284c7, roughness: 0.1, metalness: 0.7 }));
+            river.position.set(0, 0.05, 0);
+
+            // Wooden Bridge
+            const bridge = new THREE.Mesh(new THREE.BoxGeometry(9, 0.25, 3.5), new THREE.MeshStandardMaterial({ color: 0x5c3d2e }));
+            bridge.position.set(0, 0.18, 0);
+
+            landmarkGroup.add(river, bridge);
+
+            // Trees and Rocks
+            for (let i = 0; i < 14; i++) {
                 const tree = new THREE.Group();
-                const trunk = new THREE.Mesh(new THREE.CylinderGeometry(0.15, 0.2, 1), new THREE.MeshStandardMaterial({color: 0x78350f}));
-                trunk.position.y = 0.5;
-                const leaves = new THREE.Mesh(new THREE.ConeGeometry(0.8, 1.8, 6), new THREE.MeshStandardMaterial({color: 0x16a34a}));
-                leaves.position.y = 1.6;
+                const trunk = new THREE.Mesh(new THREE.CylinderGeometry(0.2, 0.35, 2), new THREE.MeshStandardMaterial({ color: 0x4a2e1b }));
+                trunk.position.y = 1;
+                const leaves = new THREE.Mesh(new THREE.DodecahedronGeometry(1.2), new THREE.MeshStandardMaterial({ color: 0x16a34a, roughness: 0.6 }));
+                leaves.position.y = 2.4;
                 tree.add(trunk, leaves);
-                tree.position.set((Math.random() - 0.5) * 20, 0, (Math.random() - 0.5) * 20);
+
+                let x = (Math.random() - 0.5) * 30;
+                if (Math.abs(x) < 5.5) x = 7;
+                tree.position.set(x, 0, (Math.random() - 0.5) * 30);
                 landmarkGroup.add(tree);
             }
         }
 
-        function createRocks() {
-            for (let i = 0; i < 10; i++) {
-                const rock = new THREE.Mesh(new THREE.DodecahedronGeometry(Math.random() * 0.8 + 0.4), new THREE.MeshStandardMaterial({color: 0x64748b}));
-                rock.position.set((Math.random() - 0.5) * 22, 0.3, (Math.random() - 0.5) * 22);
-                landmarkGroup.add(rock);
+        function createMountainEnvironment() {
+            for (let i = 0; i < 7; i++) {
+                const peak = new THREE.Mesh(new THREE.ConeGeometry(4, 8, 6), new THREE.MeshStandardMaterial({ color: 0x475569, roughness: 0.9 }));
+                peak.position.set((Math.random() - 0.5) * 28, 4, -4 + (Math.random() - 0.5) * 12);
+                landmarkGroup.add(peak);
             }
         }
 
-        function createPyramids() {
-            const pyramid = new THREE.Mesh(new THREE.ConeGeometry(3, 3, 4), new THREE.MeshStandardMaterial({color: 0xf59e0b}));
-            pyramid.position.set(0, 1.5, -4);
-            pyramid.rotation.y = Math.PI / 4;
-            landmarkGroup.add(pyramid);
+        function createDesertEnvironment() {
+            const pyr = new THREE.Mesh(new THREE.ConeGeometry(6, 6, 4), new THREE.MeshStandardMaterial({ color: 0xd97706, roughness: 0.8 }));
+            pyr.rotation.y = Math.PI / 4;
+            pyr.position.set(0, 3, -6);
+
+            const oasis = new THREE.Mesh(new THREE.CylinderGeometry(3.5, 3.5, 0.1, 16), new THREE.MeshStandardMaterial({ color: 0x06b6d4, roughness: 0.2 }));
+            oasis.position.set(-7, 0.05, 4);
+
+            landmarkGroup.add(pyr, oasis);
         }
 
-        function createIslands() {
-            for (let i = 0; i < 5; i++) {
-                const island = new THREE.Mesh(new THREE.CylinderGeometry(1.5, 2, 0.4), new THREE.MeshStandardMaterial({color: 0xfde047}));
-                island.position.set((Math.random() - 0.5) * 18, 0.1, (Math.random() - 0.5) * 18);
-                landmarkGroup.add(island);
+        function createOceanEnvironment() {
+            const lighthouse = new THREE.Mesh(new THREE.CylinderGeometry(0.8, 1.3, 8, 16), new THREE.MeshStandardMaterial({ color: 0xf8fafc }));
+            lighthouse.position.set(7, 4, -5);
+            const topLight = new THREE.Mesh(new THREE.SphereGeometry(1, 16, 16), new THREE.MeshStandardMaterial({ color: 0xef4444, emissive: 0xd97706 }));
+            topLight.position.set(7, 8.2, -5);
+
+            landmarkGroup.add(lighthouse, topLight);
+        }
+
+        function createCityEnvironment() {
+            const road = new THREE.Mesh(new THREE.PlaneGeometry(36, 7), new THREE.MeshStandardMaterial({ color: 0x1e293b }));
+            road.rotation.x = -Math.PI / 2;
+            road.position.set(0, 0.02, 0);
+            landmarkGroup.add(road);
+
+            for (let i = 0; i < 6; i++) {
+                const h = Math.random() * 6 + 6;
+                const b = new THREE.Mesh(new THREE.BoxGeometry(3, h, 3), new THREE.MeshStandardMaterial({ color: 0x334155 }));
+                let z = (i % 2 === 0) ? -8 : 8;
+                b.position.set(-13 + (i * 5.2), h / 2, z);
+                landmarkGroup.add(b);
             }
         }
 
-        function createBuildings() {
-            for (let i = 0; i < 8; i++) {
-                const h = Math.random() * 4 + 2;
-                const building = new THREE.Mesh(new THREE.BoxGeometry(1.5, h, 1.5), new THREE.MeshStandardMaterial({color: 0x475569}));
-                building.position.set((Math.random() - 0.5) * 20, h/2, (Math.random() - 0.5) * 20);
-                landmarkGroup.add(building);
-            }
+        function createTempleEnvironment() {
+            const base1 = new THREE.Mesh(new THREE.BoxGeometry(9, 1.2, 9), new THREE.MeshStandardMaterial({ color: 0x78350f }));
+            base1.position.set(0, 0.6, -4);
+            const base2 = new THREE.Mesh(new THREE.BoxGeometry(6.5, 1.2, 6.5), new THREE.MeshStandardMaterial({ color: 0x92400e }));
+            base2.position.set(0, 1.8, -4);
+            const stupa = new THREE.Mesh(new THREE.ConeGeometry(2, 3.5, 8), new THREE.MeshStandardMaterial({ color: 0xfacc15, metalness: 0.6 }));
+            stupa.position.set(0, 4.1, -4);
+
+            landmarkGroup.add(base1, base2, stupa);
         }
 
-        function createTemple() {
-            const base = new THREE.Mesh(new THREE.BoxGeometry(5, 0.8, 5), new THREE.MeshStandardMaterial({color: 0xd97706}));
-            base.position.set(0, 0.4, -2);
-            const pillar = new THREE.Mesh(new THREE.CylinderGeometry(0.4, 0.4, 3, 8), new THREE.MeshStandardMaterial({color: 0xfef08a}));
-            pillar.position.set(-1.8, 2, -2);
-            const pillar2 = pillar.clone();
-            pillar2.position.x = 1.8;
-            landmarkGroup.add(base, pillar, pillar2);
-        }
-
+        // --- ANIMATION LOOP WITH WALKING SKELETAL GAIT & FACIAL ANIMATIONS ---
         function animate3D() {
             requestAnimationFrame(animate3D);
 
-            // Move player smoothly to target
-            playerMesh.position.x += (targetPlayerPos.x - playerMesh.position.x) * 0.08;
-            playerMesh.position.z += (targetPlayerPos.z - playerMesh.position.z) * 0.08;
+            const dx = targetPlayerPos.x - playerMesh.position.x;
+            const dz = targetPlayerPos.z - playerMesh.position.z;
+            const dist = Math.sqrt(dx * dx + dz * dz);
 
-            // Subtle bobbing walk effect
-            if (Math.abs(targetPlayerPos.x - playerMesh.position.x) > 0.05) {
-                playerMesh.position.y = Math.sin(Date.now() * 0.01) * 0.1;
+            const statusLabel = document.getElementById('characterStatus');
+
+            if (dist > 0.12) {
+                // Moving status
+                if (statusLabel) statusLabel.innerText = "Status: Berjalan Menuju Pos Tujuan...";
+
+                playerMesh.position.x += dx * 0.05;
+                playerMesh.position.z += dz * 0.05;
+
+                // Face movement direction
+                const targetAngle = Math.atan2(dx, dz);
+                playerMesh.rotation.y = targetAngle;
+
+                // FULL ARTICULATED GAIT WALK CYCLE
+                const walkTime = Date.now() * 0.012;
+                
+                // Legs swing
+                upperLegL.rotation.x = Math.sin(walkTime) * 0.6;
+                upperLegR.rotation.x = -Math.sin(walkTime) * 0.6;
+                lowerLegL.rotation.x = Math.max(0, Math.sin(walkTime)) * 0.4;
+                lowerLegR.rotation.x = Math.max(0, -Math.sin(walkTime)) * 0.4;
+
+                // Arms swing opposite
+                upperArmL.rotation.x = -Math.sin(walkTime) * 0.5;
+                upperArmR.rotation.x = Math.sin(walkTime) * 0.5;
+
+                // Body bounce & head bobbing
+                playerMesh.position.y = Math.abs(Math.sin(walkTime * 2)) * 0.08;
+                headMesh.rotation.y = Math.sin(walkTime) * 0.1;
             } else {
+                if (statusLabel) statusLabel.innerText = "Status: Berdiri Di Pos Tujuan";
+
+                // Idle Pose Reset
+                upperLegL.rotation.x = 0;
+                upperLegR.rotation.x = 0;
+                lowerLegL.rotation.x = 0;
+                lowerLegR.rotation.x = 0;
+                upperArmL.rotation.x = 0;
+                upperArmR.rotation.x = 0;
                 playerMesh.position.y = 0;
+
+                // Idle head breathing sway
+                headMesh.rotation.y = Math.sin(Date.now() * 0.002) * 0.08;
             }
 
             controls.update();
@@ -649,11 +881,10 @@
             renderer.setSize(container.clientWidth, container.clientHeight);
         }
 
-        // --- RENDER POS BUTTONS ---
+        // --- GAMEPLAY & POS LOGIC ---
         function renderPosButtons() {
             const container = document.getElementById('posButtonsGrid');
             container.innerHTML = '';
-
             const unlocked = currentStudent ? currentStudent.unlockedPos : 1;
 
             posData.forEach(pos => {
@@ -662,22 +893,17 @@
                 const isActive = pos.id === selectedPosId;
 
                 let btnClass = "p-2 rounded-xl text-left border transition-all flex flex-col justify-between font-bold text-xs ";
-                
-                if (isCompleted) {
-                    btnClass += "bg-emerald-950/60 border-emerald-500/60 text-emerald-300 hover:bg-emerald-900/60";
-                } else if (isUnlocked) {
-                    btnClass += "bg-amber-950/60 border-amber-400 text-amber-200 hover:bg-amber-900/60";
-                } else {
-                    btnClass += "bg-slate-950/80 border-slate-800 text-slate-600 opacity-50 cursor-not-allowed";
-                }
+                if (isCompleted) btnClass += "bg-emerald-950/60 border-emerald-500/60 text-emerald-300 hover:bg-emerald-900/60";
+                else if (isUnlocked) btnClass += "bg-amber-950/60 border-amber-400 text-amber-200 hover:bg-amber-900/60";
+                else btnClass += "bg-slate-950/80 border-slate-800 text-slate-600 opacity-50 cursor-not-allowed";
 
-                if (isActive) btnClass += " ring-2 ring-amber-300 scale-105";
+                if (isActive) btnClass += " ring-2 ring-amber-300 scale-105 shadow-lg";
 
                 container.innerHTML += `
                     <button onclick="selectPos(${pos.id})" ${!isUnlocked ? 'disabled' : ''} class="${btnClass}">
                         <div class="flex justify-between items-center mb-1">
                             <span class="font-game text-[10px] text-amber-300">POS ${pos.id}</span>
-                            ${isCompleted ? '<i class="fa-solid fa-check text-emerald-400"></i>' :
+                            ${isCompleted ? '<i class="fa-solid fa-circle-check text-emerald-400"></i>' :
                               isUnlocked ? '<i class="fa-solid fa-location-dot text-amber-400"></i>' :
                               '<i class="fa-solid fa-lock text-slate-600"></i>'}
                         </div>
@@ -689,16 +915,13 @@
 
         function selectPos(posId) {
             if (!currentStudent || posId > currentStudent.unlockedPos) return;
-
             selectedPosId = posId;
             renderPosButtons();
 
             const pos = posData.find(p => p.id === posId);
-
-            // Trigger 3D Animation Movement & Environment Change
             update3DEnvironment(pos.envType);
-            targetPlayerPos.x = (Math.random() - 0.5) * 6;
-            targetPlayerPos.z = (Math.random() - 0.5) * 6;
+            targetPlayerPos.x = (Math.random() - 0.5) * 8;
+            targetPlayerPos.z = (Math.random() - 0.5) * 8;
 
             document.getElementById('posDefaultState').classList.add('hidden');
             const activeContent = document.getElementById('posActiveContent');
@@ -738,20 +961,18 @@
         function renderQuiz(pos) {
             const container = document.getElementById('quizContainer');
             container.innerHTML = '';
-
             pos.questions.forEach((q, idx) => {
                 let optionsHTML = '';
                 q.options.forEach((opt, optIdx) => {
                     optionsHTML += `
-                        <label class="flex items-center gap-2 p-2 rounded-lg bg-slate-900 border border-slate-800 hover:border-amber-500/50 cursor-pointer text-xs transition">
+                        <label class="flex items-center gap-2 p-2.5 rounded-lg bg-slate-900 border border-slate-800 hover:border-amber-500/50 cursor-pointer text-xs transition">
                             <input type="radio" name="q_${q.id}" value="${optIdx}" class="accent-amber-500">
-                            <span>${opt}</span>
+                            <span class="text-slate-300">${opt}</span>
                         </label>
                     `;
                 });
-
                 container.innerHTML += `
-                    <div class="bg-slate-950 p-3 rounded-xl border border-slate-800 space-y-2">
+                    <div class="bg-slate-950 p-3.5 rounded-xl border border-slate-800 space-y-2">
                         <p class="font-bold text-xs text-amber-200">${idx + 1}. ${q.text}</p>
                         <div class="space-y-1.5">${optionsHTML}</div>
                     </div>
@@ -762,19 +983,16 @@
         function submitQuiz() {
             const pos = posData.find(p => p.id === selectedPosId);
             let correctCount = 0;
-
             pos.questions.forEach(q => {
                 const selected = document.querySelector(`input[name="q_${q.id}"]:checked`);
-                if (selected && parseInt(selected.value) === q.correctAnswer) {
-                    correctCount++;
-                }
+                if (selected && parseInt(selected.value) === q.correctAnswer) correctCount++;
             });
 
             const score = Math.round((correctCount / pos.questions.length) * 100);
             currentStudent.scores[pos.id] = score;
 
             if (score >= pos.kkm) {
-                alert(`🎉 SELAMAT! Anda LULUS Pos ${pos.id} dengan Nilai: ${score}\n\nArea Penjelajahan Pos ${pos.id + 1} berhasil DIBUKA!`);
+                alert(`🎉 SELAMAT! Anda LULUS Pos ${pos.id} dengan Nilai: ${score}\n\nLokasi Penjelajahan Pos ${pos.id + 1} berhasil DIBUKA!`);
                 if (pos.id === currentStudent.unlockedPos && currentStudent.unlockedPos < 15) {
                     currentStudent.unlockedPos++;
                 }
@@ -783,16 +1001,14 @@
                 renderPosButtons();
                 selectPos(currentStudent.unlockedPos);
             } else {
-                alert(`❌ MAAF, Nilai Anda: ${score} (KKM: ${pos.kkm}).\n\nSilakan baca ulang materi di lokasi ini dan coba lagi!`);
+                alert(`❌ MAAF, Nilai Anda: ${score} (KKM: ${pos.kkm}).\n\nSilakan baca kembali materi pos ini dan coba lagi!`);
             }
         }
 
-        // --- TEMPLATE & CSV UPLOAD ---
+        // CSV TEMPLATE DOWNLOAD & UPLOAD
         function downloadQuestionTemplate() {
             const csvHeader = "pos_id,soal_teks,opsi_a,opsi_b,opsi_c,opsi_d,kunci_jawaban_index\n";
-            const sampleData = "1,Apa fungsi kompas saat penjelajahan?,Menentukan Arah,Mengukur Suhu,Menyalakan Api,Melihat Bintang,0\n" +
-                               "1,Apa tema visual Pos 1?,Hutan Belantara,Gurun Pasir,Kota,Laut,0\n";
-            
+            const sampleData = "1,Apa fungsi utama kompas saat penjelajahan?,Menentukan Arah,Mengukur Suhu,Menyalakan Api,Melihat Bintang,0\n";
             const blob = new Blob([csvHeader + sampleData], { type: 'text/csv' });
             const url = window.URL.createObjectURL(blob);
             const a = document.createElement('a');
@@ -804,74 +1020,54 @@
         function uploadQuestionsFromCSV(event) {
             const file = event.target.files[0];
             if (!file) return;
-
             const reader = new FileReader();
             reader.onload = function(e) {
                 const contents = e.target.result;
                 const lines = contents.split('\n');
                 let addedCount = 0;
-
                 for (let i = 1; i < lines.length; i++) {
                     const line = lines[i].trim();
                     if (!line) continue;
-
                     const cols = line.split(',');
                     if (cols.length >= 7) {
-                        const targetPosId = parseInt(cols[0].trim());
-                        const qText = cols[1].trim();
-                        const optA = cols[2].trim();
-                        const optB = cols[3].trim();
-                        const optC = cols[4].trim();
-                        const optD = cols[5].trim();
-                        const keyIndex = parseInt(cols[6].trim()) || 0;
-
-                        const targetPos = posData.find(p => p.id === targetPosId);
+                        const targetPos = posData.find(p => p.id === parseInt(cols[0].trim()));
                         if (targetPos) {
                             targetPos.questions.push({
                                 id: Date.now() + Math.random(),
-                                text: qText,
-                                options: [optA, optB, optC, optD],
-                                correctAnswer: keyIndex
+                                text: cols[1].trim(),
+                                options: [cols[2].trim(), cols[3].trim(), cols[4].trim(), cols[5].trim()],
+                                correctAnswer: parseInt(cols[6].trim()) || 0
                             });
                             addedCount++;
                         }
                     }
                 }
-
                 localStorage.setItem('edu_pos_data', JSON.stringify(posData));
                 if (db) db.collection('settings').doc('pos_data').set({ data: posData });
-
-                alert(`🎉 Berhasil mengimpor ${addedCount} soal dari file CSV!`);
+                alert(`🎉 Berhasil mengimpor ${addedCount} soal baru dari file CSV!`);
                 loadPosEditorData();
                 renderPosButtons();
             };
             reader.readAsText(file);
         }
 
-        // --- ADMIN ROLE WITH PASSWORD ---
+        // ROLE SWITCHING & ADMIN AUTH
         function switchRoleRequest(targetRole) {
             if (targetRole === 'admin' && currentRole !== 'admin') {
                 document.getElementById('modalAdminAuth').classList.remove('hidden');
                 document.getElementById('inputAdminPassword').value = '';
                 document.getElementById('inputAdminPassword').focus();
-            } else if (targetRole === 'siswa') {
-                setRole('siswa');
-            }
+            } else if (targetRole === 'siswa') setRole('siswa');
         }
 
         function verifyAdminPassword() {
-            const inputPass = document.getElementById('inputAdminPassword').value;
-            if (inputPass === ADMIN_PASS) {
+            if (document.getElementById('inputAdminPassword').value === ADMIN_PASS) {
                 closeAdminAuthModal();
                 setRole('admin');
-            } else {
-                alert("❌ Kata Sandi Admin Salah!");
-            }
+            } else alert("❌ Kata Sandi Admin Salah!");
         }
 
-        function closeAdminAuthModal() {
-            document.getElementById('modalAdminAuth').classList.add('hidden');
-        }
+        function closeAdminAuthModal() { document.getElementById('modalAdminAuth').classList.add('hidden'); }
 
         function setRole(role) {
             currentRole = role;
@@ -886,11 +1082,13 @@
                 btnSiswa.className = "px-4 py-1.5 rounded-lg text-xs font-extrabold text-slate-400 hover:text-white transition-all duration-200 flex items-center gap-2";
                 siswaPanel.classList.add('hidden');
                 adminPanel.classList.remove('hidden');
+                adminPanel.classList.add('flex');
                 adminBanner.classList.remove('hidden');
             } else {
                 btnSiswa.className = "px-4 py-1.5 rounded-lg text-xs font-extrabold transition-all duration-200 flex items-center gap-2 bg-amber-500 text-slate-950 shadow-md";
                 btnAdmin.className = "px-4 py-1.5 rounded-lg text-xs font-extrabold text-slate-400 hover:text-white transition-all duration-200 flex items-center gap-2";
                 adminPanel.classList.add('hidden');
+                adminPanel.classList.remove('flex');
                 siswaPanel.classList.remove('hidden');
                 adminBanner.classList.add('hidden');
             }
@@ -909,9 +1107,7 @@
         function populateAdminPosSelect() {
             const select = document.getElementById('adminSelectPos');
             select.innerHTML = '';
-            posData.forEach(p => {
-                select.innerHTML += `<option value="${p.id}">${p.title} (KKM: ${p.kkm})</option>`;
-            });
+            posData.forEach(p => select.innerHTML += `<option value="${p.id}">${p.title} (KKM: ${p.kkm})</option>`);
             loadPosEditorData();
         }
 
@@ -925,7 +1121,6 @@
 
             const qList = document.getElementById('adminQuestionsList');
             qList.innerHTML = '';
-
             pos.questions.forEach((q, qIdx) => {
                 qList.innerHTML += `
                     <div class="bg-slate-950 p-2.5 rounded border border-slate-800 space-y-2">
@@ -935,12 +1130,10 @@
                         </div>
                         <input type="text" value="${q.text}" id="q_text_${qIdx}" class="w-full bg-slate-900 border border-slate-700 rounded p-1 text-white">
                         <div class="grid grid-cols-2 gap-1">
-                            ${q.options.map((opt, oIdx) => `
-                                <input type="text" value="${opt}" id="q_opt_${qIdx}_${oIdx}" class="bg-slate-900 border border-slate-800 rounded p-1 text-[11px] text-slate-300">
-                            `).join('')}
+                            ${q.options.map((opt, oIdx) => `<input type="text" value="${opt}" id="q_opt_${qIdx}_${oIdx}" class="bg-slate-900 border border-slate-800 rounded p-1 text-[11px] text-slate-300">`).join('')}
                         </div>
                         <div class="flex items-center gap-2">
-                            <span class="text-[10px] text-slate-400">Kunci Jawaban Index (0-3):</span>
+                            <span class="text-[10px] text-slate-400">Index Kunci (0-3):</span>
                             <input type="number" min="0" max="3" value="${q.correctAnswer}" id="q_key_${qIdx}" class="w-12 bg-slate-900 border border-slate-700 rounded p-1 text-center font-bold text-amber-400">
                         </div>
                     </div>
@@ -949,28 +1142,19 @@
         }
 
         function addNewQuestionToPos() {
-            const posId = parseInt(document.getElementById('adminSelectPos').value);
-            const pos = posData.find(p => p.id === posId);
-            pos.questions.push({
-                id: Date.now(),
-                text: "Soal Baru...",
-                options: ["Opsi A", "Opsi B", "Opsi C", "Opsi D"],
-                correctAnswer: 0
-            });
+            const pos = posData.find(p => p.id === parseInt(document.getElementById('adminSelectPos').value));
+            pos.questions.push({ id: Date.now(), text: "Soal Baru...", options: ["A", "B", "C", "D"], correctAnswer: 0 });
             loadPosEditorData();
         }
 
         function removeQuestion(qIdx) {
-            const posId = parseInt(document.getElementById('adminSelectPos').value);
-            const pos = posData.find(p => p.id === posId);
+            const pos = posData.find(p => p.id === parseInt(document.getElementById('adminSelectPos').value));
             pos.questions.splice(qIdx, 1);
             loadPosEditorData();
         }
 
         function savePosChanges() {
-            const posId = parseInt(document.getElementById('adminSelectPos').value);
-            const pos = posData.find(p => p.id === posId);
-
+            const pos = posData.find(p => p.id === parseInt(document.getElementById('adminSelectPos').value));
             pos.title = document.getElementById('editPosTitle').value;
             pos.kkm = parseInt(document.getElementById('editPosKKM').value);
             pos.materi = document.getElementById('editPosMateri').value;
@@ -978,15 +1162,12 @@
             pos.questions.forEach((q, qIdx) => {
                 q.text = document.getElementById(`q_text_${qIdx}`).value;
                 q.correctAnswer = parseInt(document.getElementById(`q_key_${qIdx}`).value);
-                for (let oIdx = 0; oIdx < 4; oIdx++) {
-                    q.options[oIdx] = document.getElementById(`q_opt_${qIdx}_${oIdx}`).value;
-                }
+                for (let oIdx = 0; oIdx < 4; oIdx++) q.options[oIdx] = document.getElementById(`q_opt_${qIdx}_${oIdx}`).value;
             });
 
             localStorage.setItem('edu_pos_data', JSON.stringify(posData));
             if (db) db.collection('settings').doc('pos_data').set({ data: posData });
-
-            alert("✅ Perubahan Pos & Soal berhasil disimpan!");
+            alert("✅ Perubahan Pos & Kuis berhasil disimpan!");
             renderPosButtons();
         }
 
@@ -1006,17 +1187,14 @@
         function renderStudentListAdmin() {
             const container = document.getElementById('studentListContainer');
             container.innerHTML = '';
-
             studentsData.forEach(std => {
                 container.innerHTML += `
                     <div class="bg-slate-950 p-2.5 rounded-xl border border-slate-800 flex items-center justify-between text-xs">
                         <div>
                             <p class="font-bold text-amber-300">${std.name}</p>
-                            <p class="text-[10px] text-slate-400">Pos Terbuka: <span class="text-emerald-400 font-bold">Pos ${std.unlockedPos}</span></p>
+                            <p class="text-[10px] text-slate-400">Progres Terbuka: <span class="text-emerald-400 font-bold">Pos ${std.unlockedPos}</span></p>
                         </div>
-                        <button onclick="adminOverrideUnlock('${std.id}')" class="px-2 py-1 bg-amber-500/20 text-amber-300 border border-amber-500/30 rounded text-[10px] font-bold hover:bg-amber-500/40">
-                            +1 Override
-                        </button>
+                        <button onclick="adminOverrideUnlock('${std.id}')" class="px-2 py-1 bg-amber-500/20 text-amber-300 border border-amber-500/30 rounded text-[10px] font-bold hover:bg-amber-500/40 transition">+1 Override</button>
                     </div>
                 `;
             });
@@ -1033,20 +1211,12 @@
             if (db) db.collection('students').doc('list').set({ data: studentsData });
         }
 
-        // --- MODAL IDENTITAS SISWA ---
-        function openStudentModal() {
-            populateExistingStudentsDropdown();
-            document.getElementById('modalStudentEntry').classList.remove('hidden');
-        }
-
-        function closeStudentModal() {
-            document.getElementById('modalStudentEntry').classList.add('hidden');
-        }
-
+        // STUDENT MODAL LOGIC
+        function openStudentModal() { populateExistingStudentsDropdown(); document.getElementById('modalStudentEntry').classList.remove('hidden'); }
+        function closeStudentModal() { document.getElementById('modalStudentEntry').classList.add('hidden'); }
         function switchModalTab(tab) {
             document.getElementById('btnModalTabNew').className = tab === 'new' ? "flex-1 py-2 text-amber-400 border-b-2 border-amber-400" : "flex-1 py-2 text-slate-400 hover:text-white";
             document.getElementById('btnModalTabSelect').className = tab === 'select' ? "flex-1 py-2 text-amber-400 border-b-2 border-amber-400" : "flex-1 py-2 text-slate-400 hover:text-white";
-            
             document.getElementById('modalTabContentNew').classList.toggle('hidden', tab !== 'new');
             document.getElementById('modalTabContentSelect').classList.toggle('hidden', tab !== 'select');
         }
@@ -1054,26 +1224,13 @@
         function registerNewStudent() {
             const name = document.getElementById('inputNewStudentName').value.trim();
             const cls = document.getElementById('inputNewStudentClass').value.trim();
+            if (!name) return alert("⚠️ Masukkan nama Anda!");
 
-            if (!name) {
-                alert("⚠️ Masukkan nama Anda terlebih dahulu!");
-                return;
-            }
-
-            const fullName = cls ? `${name} (${cls})` : name;
-            const newStudent = {
-                id: 'std_' + Date.now(),
-                name: fullName,
-                unlockedPos: 1,
-                scores: {}
-            };
-
+            const newStudent = { id: 'std_' + Date.now(), name: cls ? `${name} (${cls})` : name, unlockedPos: 1, scores: {} };
             studentsData.push(newStudent);
             currentStudent = newStudent;
-
             saveStudentsData();
             localStorage.setItem('edu_active_student_id', newStudent.id);
-
             closeStudentModal();
             updateStudentProgressUI();
             renderPosButtons();
@@ -1081,9 +1238,7 @@
         }
 
         function loginExistingStudent() {
-            const stdId = document.getElementById('selectExistingStudent').value;
-            const found = studentsData.find(s => s.id === stdId);
-
+            const found = studentsData.find(s => s.id === document.getElementById('selectExistingStudent').value);
             if (found) {
                 currentStudent = found;
                 localStorage.setItem('edu_active_student_id', found.id);
@@ -1096,53 +1251,37 @@
         function populateExistingStudentsDropdown() {
             const select = document.getElementById('selectExistingStudent');
             select.innerHTML = '';
-            studentsData.forEach(s => {
-                select.innerHTML += `<option value="${s.id}">${s.name} (Pos ${s.unlockedPos})</option>`;
-            });
+            studentsData.forEach(s => select.innerHTML += `<option value="${s.id}">${s.name} (Pos ${s.unlockedPos})</option>`);
         }
 
         function saveFirebaseConfig() {
             let rawInput = document.getElementById('firebaseConfigInput').value.trim();
             try {
                 if (rawInput.includes('firebaseConfig')) {
-                    rawInput = rawInput.replace(/const\s+firebaseConfig\s*=\s*/, '');
-                    rawInput = rawInput.replace(/;\s*$/, '');
+                    rawInput = rawInput.replace(/const\s+firebaseConfig\s*=\s*/, '').replace(/;\s*$/, '');
                 }
-                
-                let jsonStr = rawInput
-                    .replace(/([{,]\s*)([a-zA-Z0-9_]+)(\s*:\s*)/g, '$1"$2"$3')
-                    .replace(/,\s*}/g, '}');
-
-                const config = JSON.parse(jsonStr);
-                localStorage.setItem('firebase_config', JSON.stringify(config));
+                let jsonStr = rawInput.replace(/([{,]\s*)([a-zA-Z0-9_]+)(\s*:\s*)/g, '$1"$2"$3').replace(/,\s*}/g, '}');
+                localStorage.setItem('firebase_config', JSON.stringify(JSON.parse(jsonStr)));
                 alert("🎉 Konfigurasi Firebase Berhasil Disimpan!");
                 location.reload();
-            } catch (e) {
-                alert("❌ Format tidak terbaca. Paste kode dari Firebase Console.");
-            }
+            } catch (e) { alert("❌ Format tidak valid. Paste objek firebaseConfig dari Console."); }
         }
 
         function initFirebaseFromStorage() {
             const stored = localStorage.getItem('firebase_config');
             if (stored) {
                 try {
-                    const config = JSON.parse(stored);
-                    firebase.initializeApp(config);
+                    firebase.initializeApp(JSON.parse(stored));
                     db = firebase.firestore();
                     document.getElementById('firebaseStatusDot').className = "w-2 h-2 rounded-full bg-emerald-400 inline-block";
-                    document.getElementById('firebaseStatusText').innerText = "Firebase Connected";
-                } catch (e) {
-                    console.error(e);
-                }
+                    document.getElementById('firebaseStatusText').innerText = "Firebase Terhubung";
+                } catch (e) { console.error(e); }
             }
         }
 
         function exportToCSV() {
             let csv = "ID,Nama Siswa,Pos Terbuka,Nilai Pos 1,Nilai Pos 2,Nilai Pos 3\n";
-            studentsData.forEach(s => {
-                csv += `${s.id},${s.name},${s.unlockedPos},${s.scores[1] || 0},${s.scores[2] || 0},${s.scores[3] || 0}\n`;
-            });
-
+            studentsData.forEach(s => csv += `${s.id},${s.name},${s.unlockedPos},${s.scores[1] || 0},${s.scores[2] || 0},${s.scores[3] || 0}\n`);
             const blob = new Blob([csv], { type: 'text/csv' });
             const url = window.URL.createObjectURL(blob);
             const a = document.createElement('a');
