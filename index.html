@@ -85,7 +85,7 @@
     <!-- ADMIN BANNER INDICATOR -->
     <div id="adminBanner" class="hidden bg-gradient-to-r from-red-900/90 via-amber-900/90 to-red-900/90 border-b border-red-500/50 px-4 py-2 text-center text-xs font-bold text-amber-200 shadow-inner">
         <i class="fa-solid fa-shield-halved text-amber-400 animate-pulse mr-2"></i>
-        MODE ADMIN AKTIF: Anda memiliki akses mengelola pos, kuis, KKM, dan progres seluruh siswa.
+        MODE ADMIN AKTIF: Anda memiliki akses mengelola pos, kuis, upload template soal, dan progres siswa.
     </div>
 
     <!-- MAIN CONTAINER -->
@@ -94,7 +94,6 @@
         <!-- LEFT PANEL: MAP PENDAKIAN -->
         <section class="lg:col-span-2 flex flex-col gap-4">
             
-            <!-- Mountain Header Card -->
             <div class="wood-panel rounded-2xl p-4 flex flex-wrap items-center justify-between gap-4 text-amber-100">
                 <div>
                     <h2 class="font-game text-2xl text-amber-300 flex items-center gap-2">
@@ -117,7 +116,6 @@
                 </div>
             </div>
 
-            <!-- VISUAL MAP CONTAINER -->
             <div class="relative bg-slate-950/60 rounded-2xl border-2 border-slate-700/60 p-4 sm:p-6 overflow-hidden min-h-[600px] flex flex-col justify-between">
                 <svg class="absolute inset-0 w-full h-full pointer-events-none opacity-20" xmlns="http://www.w3.org/2000/svg">
                     <path id="svgTrailPath" class="trail-line" d="M 100 550 Q 250 500 400 520 T 700 450 T 300 380 T 600 300 T 200 220 T 500 120 T 400 50" fill="transparent" stroke-width="4"/>
@@ -149,7 +147,6 @@
                     </div>
                 </div>
 
-                <!-- Legend -->
                 <div class="relative z-10 mt-6 pt-4 border-t border-slate-800 flex flex-wrap items-center justify-between text-xs text-slate-400 gap-2">
                     <div class="flex items-center gap-4">
                         <span class="flex items-center gap-1.5"><i class="fa-solid fa-lock text-slate-500"></i> Terkunci</span>
@@ -174,7 +171,6 @@
                     <p class="text-xs text-slate-400 mt-2">Klik salah satu pos yang sudah terbuka di peta untuk mempelajari materi dan mengerjakan tantangan kuis.</p>
                 </div>
 
-                <!-- Active Pos Card Content -->
                 <div id="posActiveContent" class="hidden flex-col h-full">
                     <div class="border-b border-slate-800 pb-3 mb-4 flex items-center justify-between">
                         <div>
@@ -220,7 +216,7 @@
                     <h3 class="font-game text-xl text-red-400 flex items-center gap-2">
                         <i class="fa-solid fa-sliders"></i> Panel Kelola Admin
                     </h3>
-                    <p class="text-xs text-slate-400">Atur kuis, KKM, override siswa, dan koneksi Firebase.</p>
+                    <p class="text-xs text-slate-400">Atur kuis, KKM, upload template soal, dan koneksi Firebase.</p>
                 </div>
 
                 <div class="flex gap-1 bg-slate-950 p-1 rounded-xl border border-slate-800 mb-4 text-[11px] font-bold">
@@ -246,8 +242,23 @@
                     <div id="studentListContainer" class="space-y-2 max-h-[380px] overflow-y-auto pr-1"></div>
                 </div>
 
-                <!-- Admin Tab 2: Editor Pos & Soal -->
+                <!-- Admin Tab 2: Editor Pos & FITUR UPLOAD TEMPLATE -->
                 <div id="adminTabContentEditor" class="hidden space-y-3 overflow-y-auto max-h-[420px] pr-1 text-xs">
+                    
+                    <!-- FITUR UPLOAD FILE SOAL FROM TEMPLATE -->
+                    <div class="bg-amber-950/40 border border-amber-500/30 p-3 rounded-xl space-y-2">
+                        <span class="font-bold text-amber-300 block"><i class="fa-solid fa-file-csv mr-1"></i> Impor Soal via File CSV:</span>
+                        <div class="flex gap-2">
+                            <button onclick="downloadQuestionTemplate()" class="flex-1 py-1.5 bg-slate-800 hover:bg-slate-700 text-amber-300 rounded border border-slate-700 text-[10px] font-bold">
+                                <i class="fa-solid fa-download mr-1"></i> Download Template
+                            </button>
+                            <label class="flex-1 py-1.5 bg-amber-600 hover:bg-amber-500 text-slate-950 rounded text-[10px] font-extrabold text-center cursor-pointer">
+                                <i class="fa-solid fa-upload mr-1"></i> Upload File CSV
+                                <input type="file" id="csvFileInput" accept=".csv" class="hidden" onchange="uploadQuestionsFromCSV(event)">
+                            </label>
+                        </div>
+                    </div>
+
                     <div>
                         <label class="block font-bold text-slate-300 mb-1">Pilih Pos yang Ingin Diedit:</label>
                         <select id="adminSelectPos" onchange="loadPosEditorData()" class="w-full bg-slate-950 border border-slate-800 rounded-lg p-2 text-amber-300 font-bold focus:outline-none focus:border-amber-500"></select>
@@ -269,7 +280,7 @@
                     <div class="pt-2 border-t border-slate-800">
                         <div class="flex justify-between items-center mb-2">
                             <span class="font-bold text-amber-400">Daftar Soal Kuis Pos Ini:</span>
-                            <button onclick="addNewQuestionToPos()" class="text-[10px] bg-emerald-600 hover:bg-emerald-500 px-2 py-1 rounded text-white font-bold">+ Tambah Soal</button>
+                            <button onclick="addNewQuestionToPos()" class="text-[10px] bg-emerald-600 hover:bg-emerald-500 px-2 py-1 rounded text-white font-bold">+ Tambah Manual</button>
                         </div>
                         <div id="adminQuestionsList" class="space-y-3"></div>
                     </div>
@@ -281,7 +292,7 @@
                 <!-- Admin Tab 3: Firebase Config -->
                 <div id="adminTabContentFirebase" class="hidden space-y-3 text-xs">
                     <p class="text-slate-400 leading-relaxed">
-                        Tempelkan konfigurasi Firebase Anda di sini. Anda bisa langsung paste seluruh teks dari Firebase Console.
+                        Tempelkan konfigurasi Firebase Anda di sini dari Firebase Console.
                     </p>
                     <div>
                         <label class="block font-bold text-slate-300 mb-1">Config Firebase:</label>
@@ -306,13 +317,11 @@
                 <p class="text-xs text-slate-400 mt-1">Masukkan nama Anda untuk mulai mendaki 15 Pos Gunung</p>
             </div>
 
-            <!-- Tab Masuk Baru / Pilih Akun -->
             <div class="flex border-b border-slate-800 mb-4 text-xs font-bold">
                 <button id="btnModalTabNew" onclick="switchModalTab('new')" class="flex-1 py-2 text-amber-400 border-b-2 border-amber-400">Siswa Baru</button>
                 <button id="btnModalTabSelect" onclick="switchModalTab('select')" class="flex-1 py-2 text-slate-400 hover:text-white">Pilih Nama Terdaftar</button>
             </div>
 
-            <!-- Content: Siswa Baru -->
             <div id="modalTabContentNew" class="space-y-4">
                 <div>
                     <label class="block text-xs text-slate-300 font-bold mb-1">Nama Lengkap Siswa:</label>
@@ -327,7 +336,6 @@
                 </button>
             </div>
 
-            <!-- Content: Pilih Nama -->
             <div id="modalTabContentSelect" class="hidden space-y-4">
                 <div>
                     <label class="block text-xs text-slate-300 font-bold mb-1">Pilih Nama Anda:</label>
@@ -424,7 +432,6 @@
             populateAdminPosSelect();
             populateExistingStudentsDropdown();
             
-            // Periksa akun login tersimpan
             const savedStudentId = localStorage.getItem('edu_active_student_id');
             if (savedStudentId) {
                 const found = studentsData.find(s => s.id === savedStudentId);
@@ -441,6 +448,68 @@
             }
             renderStudentListAdmin();
         };
+
+        // --- TEMPLATE DOWNLOAD & UPLOAD SOAL VIA CSV ---
+        function downloadQuestionTemplate() {
+            const csvHeader = "pos_id,soal_teks,opsi_a,opsi_b,opsi_c,opsi_d,kunci_jawaban_index\n";
+            const sampleData = "1,Apa fungsi kompas saat pendakian?,Menentukan Arah,Mengukur Suhu,Menyalakan Api,Melihat Bintang,0\n" +
+                               "1,Apa warna pos saat aktif?,Kuning/Emas,Merah Tua,Hitam,Hijau Tua,0\n" +
+                               "2,Di mana letak Pos 2?,Gerbang Hutan Pinus,Puncak Utama,Gua Batu,Danau,0\n";
+            
+            const blob = new Blob([csvHeader + sampleData], { type: 'text/csv' });
+            const url = window.URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.setAttribute('href', url);
+            a.setAttribute('download', 'template_soal_pos_gunung.csv');
+            a.click();
+        }
+
+        function uploadQuestionsFromCSV(event) {
+            const file = event.target.files[0];
+            if (!file) return;
+
+            const reader = new FileReader();
+            reader.onload = function(e) {
+                const contents = e.target.result;
+                const lines = contents.split('\n');
+                let addedCount = 0;
+
+                for (let i = 1; i < lines.length; i++) {
+                    const line = lines[i].trim();
+                    if (!line) continue;
+
+                    const cols = line.split(',');
+                    if (cols.length >= 7) {
+                        const targetPosId = parseInt(cols[0].trim());
+                        const qText = cols[1].trim();
+                        const optA = cols[2].trim();
+                        const optB = cols[3].trim();
+                        const optC = cols[4].trim();
+                        const optD = cols[5].trim();
+                        const keyIndex = parseInt(cols[6].trim()) || 0;
+
+                        const targetPos = posData.find(p => p.id === targetPosId);
+                        if (targetPos) {
+                            targetPos.questions.push({
+                                id: Date.now() + Math.random(),
+                                text: qText,
+                                options: [optA, optB, optC, optD],
+                                correctAnswer: keyIndex
+                            });
+                            addedCount++;
+                        }
+                    }
+                }
+
+                localStorage.setItem('edu_pos_data', JSON.stringify(posData));
+                if (db) db.collection('settings').doc('pos_data').set({ data: posData });
+
+                alert(`🎉 Berhasil mengimpor ${addedCount} soal baru dari file CSV!`);
+                loadPosEditorData();
+                renderMap();
+            };
+            reader.readAsText(file);
+        }
 
         // --- ROLE SWITCH WITH PASSWORD ---
         function switchRoleRequest(targetRole) {
@@ -838,7 +907,6 @@
             if (db) db.collection('students').doc('list').set({ data: studentsData });
         }
 
-        // --- FIREBASE CONFIG PARSER ---
         function saveFirebaseConfig() {
             let rawInput = document.getElementById('firebaseConfigInput').value.trim();
             try {
