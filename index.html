@@ -45,7 +45,6 @@
             height: 100%;
             display: block;
         }
-        /* Custom scrollbar */
         ::-webkit-scrollbar {
             width: 6px;
             height: 6px;
@@ -63,6 +62,11 @@
     </style>
 </head>
 <body class="min-h-screen flex flex-col bg-slate-950 selection:bg-amber-500 selection:text-slate-900">
+
+    <!-- DEMO BANNER NOTIFICATION (Otomatis muncul jika ?demo=true) -->
+    <div id="demoBanner" class="hidden bg-gradient-to-r from-amber-500 via-yellow-500 to-amber-600 border-b border-amber-300 px-4 py-2.5 text-center text-xs font-extrabold text-slate-950 shadow-md z-50">
+        <i class="fa-solid fa-flask mr-2 text-base"></i> MODE DEMO PRATINJAU BLOG: Ini adalah simulasi interaktif. Aktivitas uji coba dan perubahan data tidak akan mengubah database atau catatan asli penjelajah.
+    </div>
 
     <!-- TOP HEADER -->
     <header class="sticky top-0 z-40 bg-slate-900/90 backdrop-blur-md border-b border-amber-500/30 px-4 py-3 shadow-xl">
@@ -375,6 +379,13 @@
     <script>
         const ADMIN_PASS = "240785";
 
+        // ==========================================
+        // SKRIP PENDETEKSI MODE DEMO (?demo=true)
+        // ==========================================
+        const urlParams = new URLSearchParams(window.location.search);
+        const isDemoMode = urlParams.get('demo') === 'true' || urlParams.get('demo') === '1' || urlParams.get('mode') === 'demo';
+        window.isDemoMode = isDemoMode;
+
         const DEFAULT_POS_DATA = Array.from({ length: 15 }, (_, i) => {
             const posNum = i + 1;
             let envType = "hutan";
@@ -382,7 +393,7 @@
             
             if (posNum >= 4 && posNum <= 6) { envType = "gunung"; envName = "Pegunungan Terjal & Awan"; }
             else if (posNum >= 7 && posNum <= 9) { envType = "gurun"; envName = "Gurun Pasir & Piramida"; }
-            else if (posNum >= 10 && posNum <= 12) { envType = "laut"; envName = "Pesisir Laut & Mercusuar"; }
+            else if (posNum >= 10 && posNum <= 12) { envType = "laut"; envName = "Pesisir Pantai & Mercusuar"; }
             else if (posNum >= 13 && posNum <= 14) { envType = "kota"; envName = "Perkantoran Perkotaan Modern"; }
             else if (posNum === 15) { envType = "sejarah"; envName = "Candi Puncak Bersejarah"; }
 
@@ -421,13 +432,18 @@
             return names[num - 1] || `Pos ${num}`;
         }
 
-        let studentsData = JSON.parse(localStorage.getItem('edu_students_data')) || [
-            { id: "std_1", name: "Budi Penjelajah", unlockedPos: 1, scores: {} },
-            { id: "std_2", name: "Siti Petualang", unlockedPos: 3, scores: { 1: 100, 2: 90 } }
+        // Data awal & Data Dummy khusus Demo
+        const dummyStudentsData = [
+            { id: "std_demo_1", name: "Tamu Penjelajah (Demo)", unlockedPos: 5, scores: { 1: 90, 2: 85, 3: 95 } }
         ];
 
+        let studentsData = isDemoMode ? dummyStudentsData : (JSON.parse(localStorage.getItem('edu_students_data')) || [
+            { id: "std_1", name: "Budi Penjelajah", unlockedPos: 1, scores: {} },
+            { id: "std_2", name: "Siti Petualang", unlockedPos: 3, scores: { 1: 100, 2: 90 } }
+        ]);
+
         let currentRole = 'siswa';
-        let currentStudent = null;
+        let currentStudent = isDemoMode ? dummyStudentsData[0] : null;
         let posData = JSON.parse(localStorage.getItem('edu_pos_data')) || DEFAULT_POS_DATA;
         let selectedPosId = null;
         let db = null;
@@ -443,20 +459,39 @@
         let currentEnvType = "hutan";
 
         window.onload = function() {
+            if (isDemoMode) {
+                // Tampilkan Banner Demo
+                const banner = document.getElementById('demoBanner');
+                if (banner) banner.classList.remove('hidden');
+
+                // Update Status Database Header jadi Mode Demo
+                const statusDot = document.getElementById('firebaseStatusDot');
+                const statusText = document.getElementById('firebaseStatusText');
+                if (statusDot) statusDot.className = "w-2 h-2 rounded-full bg-amber-400 inline-block";
+                if (statusText) statusText.innerText = "Mode Demo Pratinjau (Aman)";
+
+                // Lewati modal login siswa agar pengunjung blog bisa langsung menjelajah
+                closeStudentModal();
+            }
+
             init3DScene();
             initFirebaseFromStorage();
             populateAdminPosSelect();
             populateExistingStudentsDropdown();
             
-            const savedStudentId = localStorage.getItem('edu_active_student_id');
-            if (savedStudentId) {
-                const found = studentsData.find(s => s.id === savedStudentId);
-                if (found) {
-                    currentStudent = found;
-                    closeStudentModal();
-                    updateStudentProgressUI();
+            if (!isDemoMode) {
+                const savedStudentId = localStorage.getItem('edu_active_student_id');
+                if (savedStudentId) {
+                    const found = studentsData.find(s => s.id === savedStudentId);
+                    if (found) {
+                        currentStudent = found;
+                        closeStudentModal();
+                        updateStudentProgressUI();
+                    } else openStudentModal();
                 } else openStudentModal();
-            } else openStudentModal();
+            } else {
+                updateStudentProgressUI();
+            }
 
             renderPosButtons();
             renderStudentListAdmin();
@@ -502,7 +537,6 @@
             terrainMesh.receiveShadow = true;
             scene.add(terrainMesh);
 
-            // BUILD REALISTIC PROCEDURAL 3D CARTOON HUMAN CHILD CHARACTER
             createDetailed3DHumanChild();
 
             landmarkGroup = new THREE.Group();
@@ -529,19 +563,16 @@
             const eyePupilMat = new THREE.MeshBasicMaterial({ color: 0x000000 });
             const hairMat = new THREE.MeshStandardMaterial({ color: 0x451a03, roughness: 0.8 });
 
-            // 1. HEAD & DETAILED FACIAL FEATURES
             headMesh = new THREE.Group();
             const headBase = new THREE.Mesh(new THREE.SphereGeometry(0.38, 20, 20), skinMat);
             headBase.scale.set(1, 1.1, 1);
             headBase.castShadow = true;
             headMesh.add(headBase);
 
-            // Hair
             const hairCap = new THREE.Mesh(new THREE.SphereGeometry(0.4, 16, 16, 0, Math.PI * 2, 0, Math.PI / 1.8), hairMat);
             hairCap.position.set(0, 0.05, 0);
             headMesh.add(hairCap);
 
-            // Eyes (Left & Right with White, Iris, Pupil)
             const createEye = (xSign) => {
                 const eyeGroup = new THREE.Group();
                 const eyeWhite = new THREE.Mesh(new THREE.SphereGeometry(0.08, 12, 12), eyeWhiteMat);
@@ -560,19 +591,16 @@
             rightEyeMesh = createEye(1);
             headMesh.add(leftEyeMesh, rightEyeMesh);
 
-            // Nose
             noseMesh = new THREE.Mesh(new THREE.SphereGeometry(0.045, 12, 12), skinMat);
             noseMesh.position.set(0, -0.02, 0.38);
             headMesh.add(noseMesh);
 
-            // Mouth (Expressive Curve)
             const mouthGeo = new THREE.TorusGeometry(0.07, 0.02, 8, 12, Math.PI);
             mouthMesh = new THREE.Mesh(mouthGeo, new THREE.MeshBasicMaterial({ color: 0xb91c1c }));
             mouthMesh.rotation.x = Math.PI;
             mouthMesh.position.set(0, -0.15, 0.35);
             headMesh.add(mouthMesh);
 
-            // Ears (Left & Right)
             const earGeo = new THREE.SphereGeometry(0.07, 10, 10);
             earGeo.scale(0.5, 1, 0.8);
             leftEarMesh = new THREE.Mesh(earGeo, skinMat);
@@ -581,7 +609,6 @@
             rightEarMesh.position.set(0.38, 0.02, 0);
             headMesh.add(leftEarMesh, rightEarMesh);
 
-            // Ranger Explorer Hat
             const hatBrim = new THREE.Mesh(new THREE.CylinderGeometry(0.68, 0.68, 0.04, 20), vestMat);
             hatBrim.position.y = 0.32;
             const hatCrown = new THREE.Mesh(new THREE.CylinderGeometry(0.42, 0.44, 0.3, 20), vestMat);
@@ -593,7 +620,6 @@
             headMesh.position.y = 1.45;
             playerMesh.add(headMesh);
 
-            // 2. TORSO & EXPLORER VEST / BACKPACK
             const torsoGroup = new THREE.Group();
             const shirt = new THREE.Mesh(new THREE.CylinderGeometry(0.28, 0.24, 0.6, 12), shirtMat);
             shirt.position.y = 0.95;
@@ -603,7 +629,6 @@
             vest.rotation.y = Math.PI * 0.15;
             vest.position.y = 0.95;
 
-            // Explorer Backpack
             const pack = new THREE.Mesh(new THREE.BoxGeometry(0.38, 0.48, 0.22), new THREE.MeshStandardMaterial({ color: 0x78350f }));
             pack.position.set(0, 0.98, -0.24);
             pack.castShadow = true;
@@ -611,7 +636,6 @@
             torsoGroup.add(shirt, vest, pack);
             playerMesh.add(torsoGroup);
 
-            // 3. ARTICULATED ARMS & HANDS WITH FINGERS
             const createArm = (xSign) => {
                 const armGroup = new THREE.Group();
                 armGroup.position.set(xSign * 0.34, 1.18, 0);
@@ -624,11 +648,9 @@
                 const lowerArm = new THREE.Mesh(new THREE.CylinderGeometry(0.07, 0.06, 0.3), skinMat);
                 lowerArm.position.y = -0.15;
 
-                // Hand Palm
                 const hand = new THREE.Mesh(new THREE.BoxGeometry(0.09, 0.1, 0.04), skinMat);
                 hand.position.y = -0.32;
 
-                // Fingers
                 for (let f = -0.03; f <= 0.03; f += 0.02) {
                     const finger = new THREE.Mesh(new THREE.BoxGeometry(0.018, 0.05, 0.02), skinMat);
                     finger.position.set(f, -0.06, 0);
@@ -651,7 +673,6 @@
             lowerArmR = rightArmObj.lowerArmGroup;
             handR = rightArmObj.hand;
 
-            // Add Magnifying Glass in Right Hand
             const glassRing = new THREE.Mesh(new THREE.TorusGeometry(0.12, 0.02, 8, 16), new THREE.MeshStandardMaterial({ color: 0xfacc15, metalness: 0.8 }));
             glassRing.position.set(0, -0.08, 0.12);
             glassRing.rotation.x = Math.PI / 2;
@@ -662,7 +683,6 @@
 
             playerMesh.add(upperArmL, upperArmR);
 
-            // 4. ARTICULATED LEGS & FEET WITH REALISTIC SHOES
             const createLeg = (xSign) => {
                 const legGroup = new THREE.Group();
                 legGroup.position.set(xSign * 0.16, 0.65, 0);
@@ -675,7 +695,6 @@
                 const lowerLeg = new THREE.Mesh(new THREE.CylinderGeometry(0.08, 0.07, 0.32), skinMat);
                 lowerLeg.position.y = -0.16;
 
-                // Shoe / Boot
                 const shoe = new THREE.Mesh(new THREE.BoxGeometry(0.14, 0.14, 0.28), shoeMat);
                 shoe.position.set(0, -0.32, 0.05);
                 shoe.castShadow = true;
@@ -735,19 +754,15 @@
             }
         }
 
-        // --- REALISTIC ENVIRONMENT BUILDERS ---
         function createRiverAndTreesEnvironment() {
-            // Flowing Water River
             const river = new THREE.Mesh(new THREE.BoxGeometry(8, 0.1, 36), new THREE.MeshStandardMaterial({ color: 0x0284c7, roughness: 0.1, metalness: 0.7 }));
             river.position.set(0, 0.05, 0);
 
-            // Wooden Bridge
             const bridge = new THREE.Mesh(new THREE.BoxGeometry(9, 0.25, 3.5), new THREE.MeshStandardMaterial({ color: 0x5c3d2e }));
             bridge.position.set(0, 0.18, 0);
 
             landmarkGroup.add(river, bridge);
 
-            // Trees and Rocks
             for (let i = 0; i < 14; i++) {
                 const tree = new THREE.Group();
                 const trunk = new THREE.Mesh(new THREE.CylinderGeometry(0.2, 0.35, 2), new THREE.MeshStandardMaterial({ color: 0x4a2e1b }));
@@ -817,7 +832,6 @@
             landmarkGroup.add(base1, base2, stupa);
         }
 
-        // --- ANIMATION LOOP WITH WALKING SKELETAL GAIT & FACIAL ANIMATIONS ---
         function animate3D() {
             requestAnimationFrame(animate3D);
 
@@ -828,36 +842,29 @@
             const statusLabel = document.getElementById('characterStatus');
 
             if (dist > 0.12) {
-                // Moving status
                 if (statusLabel) statusLabel.innerText = "Status: Berjalan Menuju Pos Tujuan...";
 
                 playerMesh.position.x += dx * 0.05;
                 playerMesh.position.z += dz * 0.05;
 
-                // Face movement direction
                 const targetAngle = Math.atan2(dx, dz);
                 playerMesh.rotation.y = targetAngle;
 
-                // FULL ARTICULATED GAIT WALK CYCLE
                 const walkTime = Date.now() * 0.012;
                 
-                // Legs swing
                 upperLegL.rotation.x = Math.sin(walkTime) * 0.6;
                 upperLegR.rotation.x = -Math.sin(walkTime) * 0.6;
                 lowerLegL.rotation.x = Math.max(0, Math.sin(walkTime)) * 0.4;
                 lowerLegR.rotation.x = Math.max(0, -Math.sin(walkTime)) * 0.4;
 
-                // Arms swing opposite
                 upperArmL.rotation.x = -Math.sin(walkTime) * 0.5;
                 upperArmR.rotation.x = Math.sin(walkTime) * 0.5;
 
-                // Body bounce & head bobbing
                 playerMesh.position.y = Math.abs(Math.sin(walkTime * 2)) * 0.08;
                 headMesh.rotation.y = Math.sin(walkTime) * 0.1;
             } else {
                 if (statusLabel) statusLabel.innerText = "Status: Berdiri Di Pos Tujuan";
 
-                // Idle Pose Reset
                 upperLegL.rotation.x = 0;
                 upperLegR.rotation.x = 0;
                 lowerLegL.rotation.x = 0;
@@ -866,7 +873,6 @@
                 upperArmR.rotation.x = 0;
                 playerMesh.position.y = 0;
 
-                // Idle head breathing sway
                 headMesh.rotation.y = Math.sin(Date.now() * 0.002) * 0.08;
             }
 
@@ -881,7 +887,6 @@
             renderer.setSize(container.clientWidth, container.clientHeight);
         }
 
-        // --- GAMEPLAY & POS LOGIC ---
         function renderPosButtons() {
             const container = document.getElementById('posButtonsGrid');
             container.innerHTML = '';
@@ -1005,7 +1010,6 @@
             }
         }
 
-        // CSV TEMPLATE DOWNLOAD & UPLOAD
         function downloadQuestionTemplate() {
             const csvHeader = "pos_id,soal_teks,opsi_a,opsi_b,opsi_c,opsi_d,kunci_jawaban_index\n";
             const sampleData = "1,Apa fungsi utama kompas saat penjelajahan?,Menentukan Arah,Mengukur Suhu,Menyalakan Api,Melihat Bintang,0\n";
@@ -1018,6 +1022,11 @@
         }
 
         function uploadQuestionsFromCSV(event) {
+            if (isDemoMode) {
+                alert("⚠️ Mode Demo: Fitur upload CSV dikunci untuk menjaga stabilitas pratinjau.");
+                event.target.value = '';
+                return;
+            }
             const file = event.target.files[0];
             if (!file) return;
             const reader = new FileReader();
@@ -1051,9 +1060,13 @@
             reader.readAsText(file);
         }
 
-        // ROLE SWITCHING & ADMIN AUTH
         function switchRoleRequest(targetRole) {
             if (targetRole === 'admin' && currentRole !== 'admin') {
+                if (isDemoMode) {
+                    // Di mode demo, izinkan admin masuk tanpa password khusus agar pengunjung blog bisa melihat semua fitur admin
+                    setRole('admin');
+                    return;
+                }
                 document.getElementById('modalAdminAuth').classList.remove('hidden');
                 document.getElementById('inputAdminPassword').value = '';
                 document.getElementById('inputAdminPassword').focus();
@@ -1142,18 +1155,24 @@
         }
 
         function addNewQuestionToPos() {
+            if (isDemoMode) { alert("⚠️ Mode Demo: Penambahan soal dikunci."); return; }
             const pos = posData.find(p => p.id === parseInt(document.getElementById('adminSelectPos').value));
             pos.questions.push({ id: Date.now(), text: "Soal Baru...", options: ["A", "B", "C", "D"], correctAnswer: 0 });
             loadPosEditorData();
         }
 
         function removeQuestion(qIdx) {
+            if (isDemoMode) { alert("⚠️ Mode Demo: Penghapusan soal dikunci."); return; }
             const pos = posData.find(p => p.id === parseInt(document.getElementById('adminSelectPos').value));
             pos.questions.splice(qIdx, 1);
             loadPosEditorData();
         }
 
         function savePosChanges() {
+            if (isDemoMode) {
+                alert("⚠️ Mode Demo: Perubahan pos tidak disimpan secara permanen.");
+                return;
+            }
             const pos = posData.find(p => p.id === parseInt(document.getElementById('adminSelectPos').value));
             pos.title = document.getElementById('editPosTitle').value;
             pos.kkm = parseInt(document.getElementById('editPosKKM').value);
@@ -1207,13 +1226,27 @@
         }
 
         function saveStudentsData() {
+            if (isDemoMode) return; // Mencegah penyimpanan lokal/cloud di mode demo
             localStorage.setItem('edu_students_data', JSON.stringify(studentsData));
             if (db) db.collection('students').doc('list').set({ data: studentsData });
         }
 
-        // STUDENT MODAL LOGIC
-        function openStudentModal() { populateExistingStudentsDropdown(); document.getElementById('modalStudentEntry').classList.remove('hidden'); }
+        function openStudentModal() {
+            if (isDemoMode) {
+                // Di mode demo, izinkan mengganti nama profil secara lokal instan
+                let newName = prompt("Masukkan nama panggilan penjelajah demo:", currentStudent ? currentStudent.name : "Tamu Demo");
+                if (newName) {
+                    currentStudent.name = newName;
+                    updateStudentProgressUI();
+                }
+                return;
+            }
+            populateExistingStudentsDropdown(); 
+            document.getElementById('modalStudentEntry').classList.remove('hidden'); 
+        }
+
         function closeStudentModal() { document.getElementById('modalStudentEntry').classList.add('hidden'); }
+        
         function switchModalTab(tab) {
             document.getElementById('btnModalTabNew').className = tab === 'new' ? "flex-1 py-2 text-amber-400 border-b-2 border-amber-400" : "flex-1 py-2 text-slate-400 hover:text-white";
             document.getElementById('btnModalTabSelect').className = tab === 'select' ? "flex-1 py-2 text-amber-400 border-b-2 border-amber-400" : "flex-1 py-2 text-slate-400 hover:text-white";
@@ -1255,6 +1288,7 @@
         }
 
         function saveFirebaseConfig() {
+            if (isDemoMode) { alert("⚠️ Mode Demo: Konfigurasi Firebase dikunci."); return; }
             let rawInput = document.getElementById('firebaseConfigInput').value.trim();
             try {
                 if (rawInput.includes('firebaseConfig')) {
@@ -1268,6 +1302,9 @@
         }
 
         function initFirebaseFromStorage() {
+            if (isDemoMode) {
+                return; // Lewati koneksi firebase asli saat di blog
+            }
             const stored = localStorage.getItem('firebase_config');
             if (stored) {
                 try {
